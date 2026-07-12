@@ -1,6 +1,8 @@
 import os
+import base64
 from anthropic import AsyncAnthropic
 from fastapi import HTTPException
+from typing import Optional
 from src.modules.ai.providers.base import BaseAIProvider
 
 class ClaudeProvider(BaseAIProvider):
@@ -16,16 +18,35 @@ class ClaudeProvider(BaseAIProvider):
         self.client = AsyncAnthropic(api_key=self.api_key)
         self.default_model = "claude-3-haiku-20240307"
 
-    async def generate_text(self, system_prompt: str, user_prompt: str, temperature: float = 0.7, model: str = None) -> str:
+    async def generate_text(self, system_prompt: str, user_prompt: str, temperature: float = 0.7, model: str = None, image_bytes: Optional[bytes] = None, mime_type: Optional[str] = None) -> str:
         selected_model = model or self.default_model
         try:
+            if image_bytes and mime_type:
+                base64_image = base64.b64encode(image_bytes).decode('utf-8')
+                content = [
+                    {
+                        "type": "image",
+                        "source": {
+                            "type": "base64",
+                            "media_type": mime_type,
+                            "data": base64_image,
+                        }
+                    },
+                    {
+                        "type": "text",
+                        "text": user_prompt
+                    }
+                ]
+            else:
+                content = user_prompt
+
             response = await self.client.messages.create(
                 model=selected_model,
                 max_tokens=4096,
                 temperature=temperature,
                 system=system_prompt,
                 messages=[
-                    {"role": "user", "content": user_prompt}
+                    {"role": "user", "content": content}
                 ]
             )
             return response.content[0].text

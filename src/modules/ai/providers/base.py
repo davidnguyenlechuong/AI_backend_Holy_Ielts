@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 
 class BaseAIProvider(ABC):
     """
@@ -7,7 +8,7 @@ class BaseAIProvider(ABC):
     """
 
     @abstractmethod
-    async def generate_text(self, system_prompt: str, user_prompt: str, temperature: float = 0.7, model: str = None) -> str:
+    async def generate_text(self, system_prompt: str, user_prompt: str, temperature: float = 0.7, model: str = None, image_bytes: Optional[bytes] = None, mime_type: Optional[str] = None) -> str:
         """
         Gửi request sinh text (chat completion) tới AI.
         
@@ -16,6 +17,8 @@ class BaseAIProvider(ABC):
             user_prompt: Nội dung cần AI xử lý.
             temperature: Độ sáng tạo của câu trả lời.
             model: Tên model cụ thể (nếu None sẽ dùng model mặc định của provider).
+            image_bytes: Dữ liệu ảnh dưới dạng bytes (nếu có).
+            mime_type: Định dạng của ảnh (ví dụ: image/jpeg, image/png).
             
         Returns:
             Text do AI sinh ra.

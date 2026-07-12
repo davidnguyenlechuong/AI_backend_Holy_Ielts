@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Writing AI Evaluator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-800 font-sans p-6">
+    <div class="max-w-6xl mx-auto flex flex-col lg:flex-row gap-6">
+        
+        <!-- Cột nhập liệu -->
+        <div class="w-full lg:w-5/12 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 overflow-y-auto max-h-[calc(100vh-3rem)]">
+            <h1 class="text-2xl font-bold text-blue-600 mb-6 flex items-center gap-2">
+                ✍️ Nộp Bài IELTS Writing
+            </h1>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-2 text-gray-700">Dạng bài (Task Type)</label>
+                    <select id="task_type" onchange="toggleImageUpload()" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
+                        <option value="task2">Task 2 (Nghị luận xã hội)</option>
+                        <option value="task1">Task 1 (Mô tả biểu đồ / bản đồ)</option>
+                    </select>
+                </div>
+
+                <div id="imageUploadContainer" class="hidden">
+                    <label class="block text-sm font-semibold mb-2 text-gray-700">Ảnh biểu đồ (Bắt buộc cho Task 1)</label>
+                    <input type="file" id="image" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all"/>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-2 text-gray-700">Đề bài (Topic)</label>
+                    <textarea id="topic" rows="3" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none" placeholder="Nhập đề bài vào đây..."></textarea>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold mb-2 text-gray-700">Bài làm (Essay)</label>
+                    <textarea id="essay" rows="12" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none" placeholder="Nhập bài văn của bạn vào đây..."></textarea>
+                </div>
+
+                <button id="submitBtn" onclick="evaluateEssay()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-colors flex justify-center items-center gap-2">
+                    <span>Chấm Điểm Ngay</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Cột hiển thị kết quả -->
+        <div class="w-full lg:w-7/12 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[calc(100vh-3rem)]">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">📊 Kết quả đánh giá</h2>
+            
+            <div id="loading" class="hidden flex-1 flex-col items-center justify-center text-gray-400">
+                <svg class="animate-spin h-10 w-10 text-blue-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <p>AI đang cẩn thận phân tích bài làm của bạn...</p>
+            </div>
+
+            <div id="resultContainer" class="hidden flex-1 overflow-y-auto overflow-x-hidden p-2">
+                <article id="markdownOutput" class="prose prose-blue prose-p:leading-relaxed prose-headings:text-gray-800 max-w-none">
+                    <!-- Markdown HTML chui vào đây -->
+                </article>
+            </div>
+            
+            <div id="emptyState" class="flex-1 flex items-center justify-center text-gray-400 italic">
+                Hãy nộp bài để xem AI nhận xét chi tiết nhé!
+            </div>
+        </div>
+        
+    </div>
+
+    <script>
+        document.getElementById('topic').value = "Some people think that strict punishments for driving offences are the key to reducing traffic accidents. Others, however, believe that other measures would be more effective. Discuss both these views and give your own opinion.";
+        document.getElementById('essay').value = "Traffic accidents have become a widespread concern in modern society. While some argue that imposing harsh penalties on driving offenders is the best solution, I am of the opinion that alternative measures such as improving public awareness and upgrading road infrastructure are equally, if not more, effective.";
+
+        function toggleImageUpload() {
+            const taskType = document.getElementById('task_type').value;
+            const imgContainer = document.getElementById('imageUploadContainer');
+            if (taskType === 'task1') {
+                imgContainer.classList.remove('hidden');
+            } else {
+                imgContainer.classList.add('hidden');
+            }
+        }
+
+        async function evaluateEssay() {
+            const taskType = document.getElementById('task_type').value;
+            const topic = document.getElementById('topic').value;
+            const essay = document.getElementById('essay').value;
+            const imageInput = document.getElementById('image');
+            
+            const btn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const resultContainer = document.getElementById('resultContainer');
+            const emptyState = document.getElementById('emptyState');
+            const markdownOutput = document.getElementById('markdownOutput');
+
+            // Validate
+            if (taskType === 'task1' && (!imageInput.files || imageInput.files.length === 0)) {
+                alert("Vui lòng đính kèm ảnh biểu đồ cho Task 1!");
+                return;
+            }
+
+            // Hiệu ứng Loading
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            emptyState.classList.add('hidden');
+            resultContainer.classList.add('hidden');
+            loading.classList.remove('hidden');
+            loading.classList.add('flex');
+
+            try {
+                let response;
+
+                if (taskType === 'task1') {
+                    // Task 1: Gửi Multipart Form Data (Kèm ảnh)
+                    const formData = new FormData();
+                    formData.append('topic', topic);
+                    formData.append('essay', essay);
+                    formData.append('image', imageInput.files[0]);
+
+                    response = await fetch('http://127.0.0.1:8000/api/v1/writing/evaluate/task1', {
+                        method: 'POST',
+                        body: formData
+                    });
+                } else {
+                    // Task 2: Gửi JSON thuần túy (Không kèm ảnh)
+                    response = await fetch('http://127.0.0.1:8000/api/v1/writing/evaluate/task2', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ topic, essay })
+                    });
+                }
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    const htmlContent = marked.parse(data.data.feedback);
+                    markdownOutput.innerHTML = htmlContent;
+                    
+                    loading.classList.add('hidden');
+                    loading.classList.remove('flex');
+                    resultContainer.classList.remove('hidden');
+                } else {
+                    alert("Lỗi từ server: " + (data.detail || JSON.stringify(data)));
+                    loading.classList.add('hidden');
+                    loading.classList.remove('flex');
+                    emptyState.classList.remove('hidden');
+                }
+            } catch (error) {
+                alert("Không kết nối được server. Vui lòng kiểm tra lại terminal!");
+                loading.classList.add('hidden');
+                loading.classList.remove('flex');
+                emptyState.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+    </script>
+</body>
+</html>

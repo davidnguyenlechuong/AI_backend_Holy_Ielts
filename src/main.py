@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from dotenv import load_dotenv
 
@@ -11,6 +12,15 @@ app = FastAPI(
     title="IELTS AI API",
     description="Backend API cho ứng dụng luyện thi IELTS bằng AI",
     version="1.0.0"
+)
+
+# Cấu hình CORS để frontend có thể gọi được API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Đăng ký router writing (không yêu cầu Auth)
