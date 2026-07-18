@@ -18,7 +18,7 @@ class OpenAIProvider(BaseAIProvider):
         self.client = AsyncOpenAI(api_key=self.api_key)
         self.default_model = "gpt-4o"
 
-    async def generate_text(self, system_prompt: str, user_prompt: str, temperature: float = 0.7, model: str = None, image_bytes: Optional[bytes] = None, mime_type: Optional[str] = None) -> str:
+    async def generate_text(self, system_prompt: str, user_prompt: str, temperature: float = 0.7, model: str = None, image_bytes: Optional[bytes] = None, mime_type: Optional[str] = None, audio_bytes: Optional[bytes] = None, audio_mime_type: Optional[str] = None) -> str:
         selected_model = model or self.default_model
         
         try:
@@ -34,6 +34,24 @@ class OpenAIProvider(BaseAIProvider):
                             "type": "image_url",
                             "image_url": {
                                 "url": f"data:{mime_type};base64,{base64_image}"
+                            }
+                        }
+                    ]
+                })
+            elif audio_bytes and audio_mime_type:
+                base64_audio = base64.b64encode(audio_bytes).decode('utf-8')
+                # OpenAI GPT-4o Audio API structure (format must be "wav" or "mp3")
+                # Using general "wav" if mime_type contains wav, else "mp3"
+                audio_format = "wav" if "wav" in audio_mime_type.lower() else "mp3"
+                messages.append({
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": user_prompt},
+                        {
+                            "type": "input_audio",
+                            "input_audio": {
+                                "data": base64_audio,
+                                "format": audio_format
                             }
                         }
                     ]

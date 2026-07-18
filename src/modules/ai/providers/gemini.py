@@ -18,13 +18,18 @@ class GeminiProvider(BaseAIProvider):
         self.client = genai.Client(api_key=self.api_key)
         self.default_model = "gemini-3.5-flash"
 
-    async def generate_text(self, system_prompt: str, user_prompt: str, temperature: float = 0.7, model: str = None, image_bytes: Optional[bytes] = None, mime_type: Optional[str] = None) -> str:
+    async def generate_text(self, system_prompt: str, user_prompt: str, temperature: float = 0.7, model: str = None, image_bytes: Optional[bytes] = None, mime_type: Optional[str] = None, audio_bytes: Optional[bytes] = None, audio_mime_type: Optional[str] = None) -> str:
         selected_model = model or self.default_model
         
         try:
             if image_bytes and mime_type:
                 contents = [
                     types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
+                    user_prompt
+                ]
+            elif audio_bytes and audio_mime_type:
+                contents = [
+                    types.Part.from_bytes(data=audio_bytes, mime_type=audio_mime_type),
                     user_prompt
                 ]
             else:
