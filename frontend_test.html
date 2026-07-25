@@ -73,6 +73,74 @@
         document.getElementById('topic').value = "Some people think that strict punishments for driving offences are the key to reducing traffic accidents. Others, however, believe that other measures would be more effective. Discuss both these views and give your own opinion.";
         document.getElementById('essay').value = "Traffic accidents have become a widespread concern in modern society. While some argue that imposing harsh penalties on driving offenders is the best solution, I am of the opinion that alternative measures such as improving public awareness and upgrading road infrastructure are equally, if not more, effective.";
 
+        // Mỗi tiêu chí có thể có nhiều key khác nhau tùy model (VD: task_response / task_achievement)
+        const CRITERIA_CONFIG = [
+            { keys: ['task_response', 'task_achievement'], label: 'Task Response (TR)' },
+            { keys: ['coherence_cohesion'], label: 'Coherence & Cohesion (CC)' },
+            { keys: ['lexical_resource'], label: 'Lexical Resource (LR)' },
+            { keys: ['grammatical_range_accuracy'], label: 'Grammatical Range & Accuracy (GRA)' }
+        ];
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // Trả về class màu theo mức band: >=7 xanh, 5-6 vàng, <5 đỏ
+        function getBandColorClasses(band) {
+            const b = Number(band);
+            if (isNaN(b)) return { text: 'text-gray-600', bg: 'bg-gray-100', border: 'border-gray-300' };
+            if (b >= 7) return { text: 'text-green-700', bg: 'bg-green-100', border: 'border-green-400' };
+            if (b >= 5) return { text: 'text-yellow-700', bg: 'bg-yellow-100', border: 'border-yellow-400' };
+            return { text: 'text-red-700', bg: 'bg-red-100', border: 'border-red-400' };
+        }
+
+        // Task 2 trả về JSON có cấu trúc { task_response, coherence_cohesion, lexical_resource,
+        // grammatical_range_accuracy, overall_band, overall_feedback } thay vì 1 chuỗi text đơn giản.
+        function renderTask2Feedback(feedback) {
+            const overallColor = getBandColorClasses(feedback.overall_band);
+
+            let html = `
+                <div class="mb-6 text-center border-b pb-5">
+                    <span class="text-sm text-gray-500 uppercase tracking-wide">Overall Band</span>
+                    <div class="text-6xl font-extrabold ${overallColor.text}">${feedback.overall_band ?? '-'}</div>
+                </div>
+            `;
+
+            for (const { keys, label } of CRITERIA_CONFIG) {
+                const criterion = keys.map(k => feedback[k]).find(v => v);
+                if (!criterion) continue;
+                const color = getBandColorClasses(criterion.band);
+                html += `
+                    <div class="mb-5 p-4 border ${color.border} rounded-xl bg-white">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-bold text-gray-800">${label}</h3>
+                            <span class="${color.bg} ${color.text} font-bold px-3 py-1 rounded-full text-sm whitespace-nowrap">Band ${criterion.band ?? '-'}</span>
+                        </div>
+                        <div class="text-gray-700">${marked.parse(criterion.assessment || '')}</div>
+                        ${criterion.evidence ? `
+                            <details class="mt-3">
+                                <summary class="text-sm text-blue-600 cursor-pointer select-none">Xem evidence</summary>
+                                <p class="text-sm text-gray-500 italic mt-2 whitespace-pre-line">${escapeHtml(criterion.evidence)}</p>
+                            </details>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            if (feedback.overall_feedback) {
+                html += `
+                    <div class="mt-6 p-5 bg-blue-50 border border-blue-200 rounded-xl">
+                        <h3 class="font-bold text-blue-800 mb-2">📝 Nhận xét tổng quan</h3>
+                        <div class="text-gray-700">${marked.parse(feedback.overall_feedback)}</div>
+                    </div>
+                `;
+            }
+
+            return html;
+        }
+
         function toggleImageUpload() {
             const taskType = document.getElementById('task_type').value;
             const imgContainer = document.getElementById('imageUploadContainer');
@@ -109,6 +177,11 @@
             loading.classList.remove('hidden');
             loading.classList.add('flex');
 
+            // Model gpt-5.6-terra suy luận sâu, cần nhiều thời gian hơn -> timeout tối thiểu 120s
+            const REQUEST_TIMEOUT_MS = 120000;
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
             try {
                 let response;
 
@@ -121,7 +194,8 @@
 
                     response = await fetch('http://127.0.0.1:8000/api/v1/writing/evaluate/task1', {
                         method: 'POST',
-                        body: formData
+                        body: formData,
+                        signal: controller.signal
                     });
                 } else {
                     // Task 2: Gửi JSON thuần túy (Không kèm ảnh)
@@ -130,16 +204,36 @@
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ topic, essay })
+                        body: JSON.stringify({ topic, essay }),
+                        signal: controller.signal
                     });
                 }
 
+                clearTimeout(timeoutId);
                 const data = await response.json();
 
                 if (response.ok && data.success) {
-                    const htmlContent = marked.parse(data.data.feedback);
-                    markdownOutput.innerHTML = htmlContent;
-                    
+                    let feedback = data.data.feedback;
+
+                    // Phòng trường hợp backend trả feedback dạng chuỗi JSON đã encode
+                    // (double-encoded) thay vì object thuần -> parse lại trước khi hiển thị.
+                    if (typeof feedback === 'string') {
+                        try {
+                            const parsed = JSON.parse(feedback);
+                            if (parsed && typeof parsed === 'object') {
+                                feedback = parsed;
+                            }
+                        } catch (e) {
+                            // Không phải JSON hợp lệ -> đây là text thường (VD: kết quả Task 1)
+                        }
+                    }
+
+                    if (typeof feedback === 'object' && feedback !== null) {
+    markdownOutput.innerHTML = renderTask2Feedback(feedback);
+} else {
+    markdownOutput.innerHTML = marked.parse(feedback);
+}
+
                     loading.classList.add('hidden');
                     loading.classList.remove('flex');
                     resultContainer.classList.remove('hidden');
@@ -150,7 +244,12 @@
                     emptyState.classList.remove('hidden');
                 }
             } catch (error) {
-                alert("Không kết nối được server. Vui lòng kiểm tra lại terminal!");
+                clearTimeout(timeoutId);
+                const errorMessage = error.name === 'AbortError'
+                    ? `Yêu cầu bị hủy vì quá thời gian chờ (${REQUEST_TIMEOUT_MS / 1000}s). Model có thể đang xử lý lâu hơn bình thường.`
+                    : (error.message || String(error));
+                alert("Lỗi khi gọi API: " + errorMessage);
+                console.error("evaluateEssay error:", error);
                 loading.classList.add('hidden');
                 loading.classList.remove('flex');
                 emptyState.classList.remove('hidden');

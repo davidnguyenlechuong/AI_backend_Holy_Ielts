@@ -16,7 +16,7 @@ class ClaudeProvider(BaseAIProvider):
             raise HTTPException(status_code=500, detail="ANTHROPIC_API_KEY is not configured.")
         
         self.client = AsyncAnthropic(api_key=self.api_key)
-        self.default_model = "claude-3-haiku-20240307"
+        self.default_model = "claude-sonnet-4-6"
 
     async def generate_text(self, system_prompt: str, user_prompt: str, temperature: float = 0.7, model: str = None, image_bytes: Optional[bytes] = None, mime_type: Optional[str] = None) -> str:
         selected_model = model or self.default_model
