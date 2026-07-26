@@ -913,6 +913,16 @@ Bài viết của học viên (Essay):
 
 ---
 
+## THÔNG TIN CÁ NHÂN HOÁ (PERSONALIZATION OPTIONS)
+- Target Band: {target_band}
+- Feedback Language: {feedback_language}
+
+**Lưu ý quan trọng cho Giám khảo:**
+1. Về Target Band: Nếu Target Band > 0, trong phần `overall_feedback` và `assessment` của từng tiêu chí, ngoài việc nhận xét lỗi sai, BẮT bắt buộc phải đưa ra những lời khuyên cụ thể và hành động cần thiết (actionable advice) để bài viết này có thể nâng band lên mức {target_band}.
+2. Về Ngôn ngữ nhận xét: Toàn bộ nội dung trả về trong các trường giải thích (`assessment`, `evidence`, `overall_feedback`) BẮT BUỘC PHẢI ĐƯỢC VIẾT BẰNG ngôn ngữ: {feedback_language} (Ví dụ: 'vi' là Tiếng Việt, 'en' là Tiếng Anh). Không áp dụng đối với các key JSON, key JSON vẫn phải giữ nguyên tiếng Anh.
+
+---
+
 ## OUTPUT FORMAT
 
 Dựa vào các tiêu chí ở trên, hãy chấm bài luận và trả về JSON đúng cấu trúc sau (không thêm text nào khác ngoài JSON):

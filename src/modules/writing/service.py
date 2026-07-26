@@ -11,7 +11,9 @@ async def evaluate_task1(
     topic: str, 
     essay: str, 
     image_bytes: bytes,
-    mime_type: str
+    mime_type: str,
+    target_band: float = 0.0,
+    feedback_language: str = "vi"
 ) -> dict:
     prompt_path = PROMPT_DIR / "writing_eval_task1.md"
     if not prompt_path.exists():
@@ -24,7 +26,10 @@ async def evaluate_task1(
     ai_provider = AIProviderFactory.get_provider(provider_type)
     
     system_prompt = "You are a helpful and expert IELTS examiner."
-    user_prompt = prompt_template.replace("{topic}", topic).replace("{essay}", essay)
+    user_prompt = prompt_template.replace("{topic}", topic)\
+                                 .replace("{essay}", essay)\
+                                 .replace("{target_band}", str(target_band))\
+                                 .replace("{feedback_language}", feedback_language)
 
     try:
         response_text = await ai_provider.generate_text(
@@ -45,7 +50,12 @@ async def evaluate_task1(
         print(f">>> LOI PARSE JSON (TASK1): {repr(e)}", flush=True)
         raise HTTPException(status_code=500, detail=str(e))
 
-async def evaluate_task2(topic: str, essay: str) -> dict:
+async def evaluate_task2(
+    topic: str, 
+    essay: str,
+    target_band: float = 0.0,
+    feedback_language: str = "vi"
+) -> dict:
     print(">>> BAT DAU XU LY REQUEST", flush=True)
 
     prompt_path = PROMPT_DIR / "writing_eval_task2.md"
@@ -60,7 +70,10 @@ async def evaluate_task2(topic: str, essay: str) -> dict:
     ai_provider = AIProviderFactory.get_provider(provider_type)
 
     system_prompt = "You are a helpful and expert IELTS examiner."
-    user_prompt = prompt_template.replace("{topic}", topic).replace("{essay}", essay)
+    user_prompt = prompt_template.replace("{topic}", topic)\
+                                 .replace("{essay}", essay)\
+                                 .replace("{target_band}", str(target_band))\
+                                 .replace("{feedback_language}", feedback_language)
 
     try:
         response_text = await ai_provider.generate_text(
