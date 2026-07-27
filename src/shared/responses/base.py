@@ -33,15 +33,15 @@ class ResponseSchema(BaseSchema, Generic[T]):
     message: str = "Thành công"
     requestId: str = Field(default_factory=get_uuid)
     timestamp: str = Field(default_factory=get_iso_timestamp)
-    data: Optional[T] = None
+    data: Union[T, dict] = Field(default_factory=dict)
     metadata: Optional[PaginationMetadata] = None
 
 class ErrorDetails(BaseSchema):
     field: str
-    message: Optional[str] = None
+    message: Optional[List[str]] = None
 
 class ErrorContent(BaseSchema):
-    details: Union[List[ErrorDetails], str]
+    details: List[ErrorDetails]
 
 class ErrorResponseSchema(BaseSchema):
     """

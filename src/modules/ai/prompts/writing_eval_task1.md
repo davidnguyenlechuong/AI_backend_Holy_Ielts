@@ -699,9 +699,13 @@ Bài viết của học viên (Essay):
 
 ---
 
-## NGÔN NGỮ NHẬN XÉT
+## THÔNG TIN CÁ NHÂN HOÁ (PERSONALIZATION OPTIONS) & NGÔN NGỮ NHẬN XÉT
+- Target Band: {target_band}
+- Feedback Language: {feedback_language}
 
-Viết toàn bộ nội dung của các trường 'assessment' và 'overall_feedback' bằng ngôn ngữ: {feedback_language} (giá trị 'vi' = tiếng Việt, 'en' = English). Trường 'evidence' (trích dẫn nguyên văn từ bài luận của thí sinh) LUÔN LUÔN giữ nguyên tiếng Anh, KHÔNG được dịch, vì đó là câu thật trong bài viết gốc.
+**Lưu ý quan trọng cho Giám khảo:**
+1. Về Target Band: Nếu Target Band > 0, trong phần `overall_feedback` và `assessment` của từng tiêu chí, ngoài việc nhận xét lỗi sai, BẮT BUỘC phải đưa ra những lời khuyên cụ thể và hành động cần thiết (actionable advice) để bài viết này có thể nâng band lên mức {target_band}.
+2. Về Ngôn ngữ nhận xét: Toàn bộ nội dung trả về trong các trường giải thích (`assessment`, `overall_feedback`) BẮT BUỘC PHẢI ĐƯỢC VIẾT BẰNG ngôn ngữ: {feedback_language} (giá trị 'vi' = tiếng Việt, 'en' = English). Trường 'evidence' (trích dẫn nguyên văn từ bài luận của thí sinh) LUÔN LUÔN giữ nguyên tiếng Anh, KHÔNG được dịch, vì đó là câu thật trong bài viết gốc. Key JSON cũng luôn giữ nguyên tiếng Anh, không áp dụng bản dịch.
 
 ---
 

@@ -1,0 +1,21 @@
+# Version control
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.env
+
+# Editor / IDE
+.vscode/
+.idea/
+
+# Lock files and metadata (we copy them explicitly in Dockerfile)
+# Note: we need pyproject.toml and uv.lock so we DON'T ignore them,
+# but we can ignore python version file.
+.python-version

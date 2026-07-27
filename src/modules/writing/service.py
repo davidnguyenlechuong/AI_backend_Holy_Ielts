@@ -12,6 +12,7 @@ async def evaluate_task1(
     essay: str,
     image_bytes: bytes,
     mime_type: str,
+    target_band: float = 0.0,
     feedback_language: str = "vi"
 ) -> dict:
     prompt_path = PROMPT_DIR / "writing_eval_task1.md"
@@ -29,6 +30,7 @@ async def evaluate_task1(
         prompt_template
         .replace("{topic}", topic)
         .replace("{essay}", essay)
+        .replace("{target_band}", str(target_band))
         .replace("{feedback_language}", feedback_language)
     )
 
@@ -51,7 +53,12 @@ async def evaluate_task1(
         print(f">>> LOI PARSE JSON (TASK1): {repr(e)}", flush=True)
         raise HTTPException(status_code=500, detail=str(e))
 
-async def evaluate_task2(topic: str, essay: str, feedback_language: str = "vi") -> dict:
+async def evaluate_task2(
+    topic: str,
+    essay: str,
+    target_band: float = 0.0,
+    feedback_language: str = "vi"
+) -> dict:
     print(">>> BAT DAU XU LY REQUEST", flush=True)
 
     prompt_path = PROMPT_DIR / "writing_eval_task2.md"
@@ -70,6 +77,7 @@ async def evaluate_task2(topic: str, essay: str, feedback_language: str = "vi") 
         prompt_template
         .replace("{topic}", topic)
         .replace("{essay}", essay)
+        .replace("{target_band}", str(target_band))
         .replace("{feedback_language}", feedback_language)
     )
 

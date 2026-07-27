@@ -24,8 +24,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     details = []
     for err in exc.errors():
         field = ".".join([str(loc) for loc in err["loc"]])
-        details.append(ErrorDetails(field=field, message=err["msg"]))
-    
+        details.append(ErrorDetails(field=field, message=[err["msg"]]))
+
     error_resp = ErrorResponseSchema(
         message="Dữ liệu không hợp lệ",
         messageCode="VALIDATION_ERROR",
@@ -39,7 +39,7 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     error_resp = ErrorResponseSchema(
         message=str(exc.detail),
         messageCode="HTTP_ERROR",
-        error=ErrorContent(details=str(exc.detail)),
+        error=ErrorContent(details=[ErrorDetails(field="server", message=[str(exc.detail)])]),
         path=request.url.path
     )
     return JSONResponse(status_code=exc.status_code, content=error_resp.model_dump(mode='json'))
@@ -49,7 +49,7 @@ async def generic_exception_handler(request: Request, exc: Exception):
     error_resp = ErrorResponseSchema(
         message="Đã xảy ra lỗi hệ thống",
         messageCode="INTERNAL_SERVER_ERROR",
-        error=ErrorContent(details=str(exc)),
+        error=ErrorContent(details=[ErrorDetails(field="server", message=[str(exc)])]),
         path=request.url.path
     )
     return JSONResponse(status_code=500, content=error_resp.model_dump(mode='json'))
