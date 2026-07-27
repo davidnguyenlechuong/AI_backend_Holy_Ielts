@@ -14,6 +14,7 @@ async def _run_speaking_evaluation(
     audio_bytes: bytes,
     mime_type: str,
     label: str,
+    feedback_language: str = "vi",
 ) -> dict:
     prompt_path = PROMPT_DIR / prompt_file
     if not prompt_path.exists():
@@ -27,7 +28,11 @@ async def _run_speaking_evaluation(
     ai_provider = AIProviderFactory.get_provider(provider_type)
 
     system_prompt = "You are a helpful and expert IELTS Speaking examiner."
-    user_prompt = prompt_template.replace(placeholder, value)
+    user_prompt = (
+        prompt_template
+        .replace(placeholder, value)
+        .replace("{feedback_language}", feedback_language)
+    )
 
     try:
         response_text = await ai_provider.generate_text(
@@ -49,7 +54,7 @@ async def _run_speaking_evaluation(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-async def evaluate_part1(question: str, audio_bytes: bytes, mime_type: str) -> dict:
+async def evaluate_part1(question: str, audio_bytes: bytes, mime_type: str, feedback_language: str = "vi") -> dict:
     return await _run_speaking_evaluation(
         prompt_file="speaking_eval_part1.md",
         placeholder="{question}",
@@ -57,10 +62,11 @@ async def evaluate_part1(question: str, audio_bytes: bytes, mime_type: str) -> d
         audio_bytes=audio_bytes,
         mime_type=mime_type,
         label="SPEAKING PART1",
+        feedback_language=feedback_language,
     )
 
 
-async def evaluate_part2(cue_card: str, audio_bytes: bytes, mime_type: str) -> dict:
+async def evaluate_part2(cue_card: str, audio_bytes: bytes, mime_type: str, feedback_language: str = "vi") -> dict:
     return await _run_speaking_evaluation(
         prompt_file="speaking_eval_part2.md",
         placeholder="{cue_card}",
@@ -68,10 +74,11 @@ async def evaluate_part2(cue_card: str, audio_bytes: bytes, mime_type: str) -> d
         audio_bytes=audio_bytes,
         mime_type=mime_type,
         label="SPEAKING PART2",
+        feedback_language=feedback_language,
     )
 
 
-async def evaluate_part3(question: str, audio_bytes: bytes, mime_type: str) -> dict:
+async def evaluate_part3(question: str, audio_bytes: bytes, mime_type: str, feedback_language: str = "vi") -> dict:
     return await _run_speaking_evaluation(
         prompt_file="speaking_eval_part3.md",
         placeholder="{question}",
@@ -79,4 +86,5 @@ async def evaluate_part3(question: str, audio_bytes: bytes, mime_type: str) -> d
         audio_bytes=audio_bytes,
         mime_type=mime_type,
         label="SPEAKING PART3",
+        feedback_language=feedback_language,
     )

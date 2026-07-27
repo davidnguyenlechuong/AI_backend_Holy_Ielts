@@ -10,16 +10,18 @@ router = APIRouter(
 @router.post("/evaluate/part1", response_model=ResponseSchema)
 async def evaluate_speaking_part1(
     question: str = Form(..., description="Câu hỏi Part 1"),
-    audio: UploadFile = File(..., description="File ghi âm câu trả lời")
+    audio: UploadFile = File(..., description="File ghi âm câu trả lời"),
+    feedback_language: str = Form("vi", description="Ngôn ngữ nhận xét: vi hoặc en")
 ):
     try:
         audio_bytes = await audio.read()
         mime_type = audio.content_type
-        
+
         feedback = await evaluate_part1(
             question=question,
             audio_bytes=audio_bytes,
-            mime_type=mime_type
+            mime_type=mime_type,
+            feedback_language=feedback_language
         )
         return ResponseSchema(
             success=True,
@@ -34,16 +36,18 @@ async def evaluate_speaking_part1(
 @router.post("/evaluate/part2", response_model=ResponseSchema)
 async def evaluate_speaking_part2(
     cue_card: str = Form(..., description="Đề bài Cue Card Part 2"),
-    audio: UploadFile = File(..., description="File ghi âm câu trả lời")
+    audio: UploadFile = File(..., description="File ghi âm câu trả lời"),
+    feedback_language: str = Form("vi", description="Ngôn ngữ nhận xét: vi hoặc en")
 ):
     try:
         audio_bytes = await audio.read()
         mime_type = audio.content_type
-        
+
         feedback = await evaluate_part2(
             cue_card=cue_card,
             audio_bytes=audio_bytes,
-            mime_type=mime_type
+            mime_type=mime_type,
+            feedback_language=feedback_language
         )
         return ResponseSchema(
             success=True,
@@ -58,16 +62,18 @@ async def evaluate_speaking_part2(
 @router.post("/evaluate/part3", response_model=ResponseSchema)
 async def evaluate_speaking_part3(
     question: str = Form(..., description="Câu hỏi Part 3"),
-    audio: UploadFile = File(..., description="File ghi âm câu trả lời")
+    audio: UploadFile = File(..., description="File ghi âm câu trả lời"),
+    feedback_language: str = Form("vi", description="Ngôn ngữ nhận xét: vi hoặc en")
 ):
     try:
         audio_bytes = await audio.read()
         mime_type = audio.content_type
-        
+
         feedback = await evaluate_part3(
             question=question,
             audio_bytes=audio_bytes,
-            mime_type=mime_type
+            mime_type=mime_type,
+            feedback_language=feedback_language
         )
         return ResponseSchema(
             success=True,

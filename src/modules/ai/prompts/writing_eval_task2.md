@@ -913,17 +913,25 @@ Bài viết của học viên (Essay):
 
 ---
 
+## NGÔN NGỮ NHẬN XÉT
+
+Viết toàn bộ nội dung của các trường 'assessment' và 'overall_feedback' bằng ngôn ngữ: {feedback_language} (giá trị 'vi' = tiếng Việt, 'en' = English). Trường 'evidence' (trích dẫn nguyên văn từ bài luận của thí sinh) LUÔN LUÔN giữ nguyên tiếng Anh, KHÔNG được dịch, vì đó là câu thật trong bài viết gốc.
+
+---
+
 ## OUTPUT FORMAT
 
 Dựa vào các tiêu chí ở trên, hãy chấm bài luận và trả về JSON đúng cấu trúc sau (không thêm text nào khác ngoài JSON):
 
 ```json
 {
-  "task_response": { "band": X, "assessment": "...", "evidence": "..." },
-  "coherence_cohesion": { "band": X, "assessment": "...", "evidence": "..." },
-  "lexical_resource": { "band": X, "assessment": "...", "evidence": "..." },
-  "grammatical_range_accuracy": { "band": X, "assessment": "...", "evidence": "..." },
+  "task_response": { "band": X, "assessment": "...", "evidence": ["...", "...", "..."] },
+  "coherence_cohesion": { "band": X, "assessment": "...", "evidence": ["...", "...", "..."] },
+  "lexical_resource": { "band": X, "assessment": "...", "evidence": ["...", "...", "..."] },
+  "grammatical_range_accuracy": { "band": X, "assessment": "...", "evidence": ["...", "...", "..."] },
   "overall_band": X,
   "overall_feedback": "Nhận xét tổng quan ngắn gọn về bài viết"
 }
 ```
+
+QUAN TRỌNG: Field 'evidence' PHẢI là một MẢNG (array) gồm 2-4 câu trích dẫn NGẮN GỌN, riêng biệt từ bài làm của thí sinh - mỗi phần tử là 1 trích dẫn độc lập, không dài quá 1-2 câu. KHÔNG viết thành 1 đoạn văn dài duy nhất.

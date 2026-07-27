@@ -13,7 +13,8 @@ router = APIRouter(
 async def evaluate_writing_task1(
     topic: str = Form(..., min_length=10, description="Đề bài IELTS Writing Task 1"),
     essay: str = Form(..., min_length=50, description="Bài viết của học viên"),
-    image: UploadFile = File(..., description="Ảnh biểu đồ (Bắt buộc với Task 1)")
+    image: UploadFile = File(..., description="Ảnh biểu đồ (Bắt buộc với Task 1)"),
+    feedback_language: str = Form("vi", description="Ngôn ngữ nhận xét: vi hoặc en")
 ):
     """
     API chấm điểm bài thi IELTS Writing Task 1.
@@ -22,12 +23,13 @@ async def evaluate_writing_task1(
     try:
         image_bytes = await image.read()
         mime_type = image.content_type
-        
+
         feedback = await evaluate_task1(
             topic=topic,
             essay=essay,
             image_bytes=image_bytes,
-            mime_type=mime_type
+            mime_type=mime_type,
+            feedback_language=feedback_language
         )
         return ResponseSchema(
             success=True,
@@ -48,7 +50,8 @@ async def evaluate_writing_task2(request: WritingTask2Request):
     try:
         feedback = await evaluate_task2(
             topic=request.topic,
-            essay=request.essay
+            essay=request.essay,
+            feedback_language=request.feedback_language
         )
         return ResponseSchema(
             success=True,
