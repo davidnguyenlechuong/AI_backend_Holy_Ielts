@@ -16,7 +16,7 @@ class OpenAIProvider(BaseAIProvider):
     # Model gpt-5.6-terra chỉ nhận content dạng "text"/"image_url", KHÔNG hỗ trợ
     # "input_audio" (trả lỗi 400 "Content blocks are expected to be either text or
     # image_url type"). Khi có audio, bắt buộc phải chuyển sang model hỗ trợ audio input.
-    AUDIO_INPUT_MODEL = "gpt-4o-audio-preview"
+    AUDIO_INPUT_MODEL = "gpt-4o-transcribe"
 
     def __init__(self, api_key: str = None):
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
