@@ -2,7 +2,7 @@ import os
 import base64
 from openai import AsyncOpenAI
 from fastapi import HTTPException
-from typing import Optional
+from typing import AsyncIterator, Optional
 from src.modules.ai.providers.base import BaseAIProvider
 
 class OpenAIProvider(BaseAIProvider):
@@ -23,60 +23,82 @@ class OpenAIProvider(BaseAIProvider):
         if not self.api_key:
             raise HTTPException(status_code=500, detail="OPENAI_API_KEY is not configured.")
 
-        self.client = AsyncOpenAI(api_key=self.api_key)
+        self.client = AsyncOpenAI(api_key=self.api_key, timeout=180)
         self.default_model = "gpt-5.6-terra"
+
+    def _build_messages(self, system_prompt: str, user_prompt: str, image_bytes: Optional[bytes], mime_type: Optional[str], audio_bytes: Optional[bytes], audio_mime_type: Optional[str]) -> list:
+        messages = [{"role": "system", "content": system_prompt}]
+
+        if image_bytes and mime_type:
+            base64_image = base64.b64encode(image_bytes).decode('utf-8')
+            messages.append({
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": user_prompt},
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:{mime_type};base64,{base64_image}"
+                        }
+                    }
+                ]
+            })
+        elif audio_bytes and audio_mime_type:
+            base64_audio = base64.b64encode(audio_bytes).decode('utf-8')
+            audio_format = "wav" if "wav" in audio_mime_type.lower() else "mp3"
+            messages.append({
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": user_prompt},
+                    {
+                        "type": "input_audio",
+                        "input_audio": {
+                            "data": base64_audio,
+                            "format": audio_format
+                        }
+                    }
+                ]
+            })
+        else:
+            messages.append({"role": "user", "content": user_prompt})
+
+        return messages
+
+    def _build_request_kwargs(self, selected_model: str, messages: list, temperature: float) -> dict:
+        request_kwargs = {"model": selected_model, "messages": messages}
+        if selected_model not in self.FIXED_TEMPERATURE_MODELS:
+            request_kwargs["temperature"] = temperature
+        if selected_model == self.AUDIO_INPUT_MODEL:
+            # Bắt buộc chỉ định modalities=["text"] để model CHỈ trả về text,
+            # không trả kèm audio (nếu không chỉ định, model có thể trả audio
+            # khiến message.content bị rỗng và câu trả lời nằm trong message.audio.transcript).
+            request_kwargs["modalities"] = ["text"]
+        return request_kwargs
 
     async def generate_text(self, system_prompt: str, user_prompt: str, temperature: float = 0.7, model: str = None, image_bytes: Optional[bytes] = None, mime_type: Optional[str] = None, audio_bytes: Optional[bytes] = None, audio_mime_type: Optional[str] = None) -> str:
         selected_model = self.AUDIO_INPUT_MODEL if audio_bytes else (model or self.default_model)
 
         try:
-            messages = [{"role": "system", "content": system_prompt}]
-            
-            if image_bytes and mime_type:
-                base64_image = base64.b64encode(image_bytes).decode('utf-8')
-                messages.append({
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": user_prompt},
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": f"data:{mime_type};base64,{base64_image}"
-                            }
-                        }
-                    ]
-                })
-            elif audio_bytes and audio_mime_type:
-                base64_audio = base64.b64encode(audio_bytes).decode('utf-8')
-                # OpenAI GPT-4o Audio API structure (format must be "wav" or "mp3")
-                # Using general "wav" if mime_type contains wav, else "mp3"
-                audio_format = "wav" if "wav" in audio_mime_type.lower() else "mp3"
-                messages.append({
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": user_prompt},
-                        {
-                            "type": "input_audio",
-                            "input_audio": {
-                                "data": base64_audio,
-                                "format": audio_format
-                            }
-                        }
-                    ]
-                })
-            else:
-                messages.append({"role": "user", "content": user_prompt})
-
-            request_kwargs = {"model": selected_model, "messages": messages}
-            if selected_model not in self.FIXED_TEMPERATURE_MODELS:
-                request_kwargs["temperature"] = temperature
-            if selected_model == self.AUDIO_INPUT_MODEL:
-                # Bắt buộc chỉ định modalities=["text"] để model CHỈ trả về text,
-                # không trả kèm audio (nếu không chỉ định, model có thể trả audio
-                # khiến message.content bị rỗng và câu trả lời nằm trong message.audio.transcript).
-                request_kwargs["modalities"] = ["text"]
+            messages = self._build_messages(system_prompt, user_prompt, image_bytes, mime_type, audio_bytes, audio_mime_type)
+            request_kwargs = self._build_request_kwargs(selected_model, messages, temperature)
 
             response = await self.client.chat.completions.create(**request_kwargs)
             return response.choices[0].message.content
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"OpenAI Evaluation Error: {str(e)}")
+
+    async def generate_text_stream(self, system_prompt: str, user_prompt: str, temperature: float = 0.7, model: str = None, image_bytes: Optional[bytes] = None, mime_type: Optional[str] = None, audio_bytes: Optional[bytes] = None, audio_mime_type: Optional[str] = None) -> AsyncIterator[str]:
+        selected_model = self.AUDIO_INPUT_MODEL if audio_bytes else (model or self.default_model)
+
+        try:
+            messages = self._build_messages(system_prompt, user_prompt, image_bytes, mime_type, audio_bytes, audio_mime_type)
+            request_kwargs = self._build_request_kwargs(selected_model, messages, temperature)
+            request_kwargs["stream"] = True
+
+            response = await self.client.chat.completions.create(**request_kwargs)
+            async for chunk in response:
+                delta = chunk.choices[0].delta.content if chunk.choices else None
+                if delta:
+                    yield delta
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"OpenAI Evaluation Error: {str(e)}")

@@ -66,7 +66,11 @@ def parse_ai_json_response(raw_response: str) -> dict[str, Any]:
     được, kèm log lại nguyên văn response thô để debug.
     """
     # In/log nguyên văn raw response TRƯỚC KHI áp dụng bất kỳ xử lý nào.
-    print(f"[AI RAW RESPONSE - BEFORE PARSING]\n{raw_response}\n[END AI RAW RESPONSE]", flush=True)
+    try:
+        print(f"[AI RAW RESPONSE - BEFORE PARSING]\n{raw_response}\n[END AI RAW RESPONSE]", flush=True)
+    except UnicodeEncodeError:
+        # Console encoding (e.g. cp1252 on Windows) can't represent some characters (Vietnamese, etc.) - don't let a debug print crash the request.
+        pass
     logger.info("Raw AI response (before parsing):\n%s", raw_response)
 
     if not raw_response or not raw_response.strip():
