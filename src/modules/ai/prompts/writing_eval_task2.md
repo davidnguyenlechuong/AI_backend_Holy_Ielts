@@ -923,6 +923,10 @@ Bài viết của học viên (Essay):
 
 ---
 
+QUAN TRỌNG - BÀI SỬA MẪU: Sau khi chấm điểm, hãy viết lại TOÀN BỘ bài luận của thí sinh ở mức band cao hơn (Khoảng band 8-9). Giữ NGUYÊN ý tưởng, lập luận và cấu trúc tổng thể của thí sinh nếu thấy hợp lý (có thể thay đổi ý tưởng và lập luận nếu như bài của người dùng quá kém và vụng về), phải cải thiện: từ vựng phong phú hơn, ngữ pháp đa dạng và chính xác hơn, sự mạch lạc/liên kết tốt hơn.
+
+---
+
 ## OUTPUT FORMAT
 
 Dựa vào các tiêu chí ở trên, hãy chấm bài luận và trả về JSON đúng cấu trúc sau (không thêm text nào khác ngoài JSON):
@@ -934,7 +938,10 @@ Dựa vào các tiêu chí ở trên, hãy chấm bài luận và trả về JSO
   "lexical_resource": { "band": X, "assessment": "...", "evidence": ["...", "...", "..."] },
   "grammatical_range_accuracy": { "band": X, "assessment": "...", "evidence": ["...", "...", "..."] },
   "overall_band": X,
-  "overall_feedback": "Nhận xét tổng quan ngắn gọn về bài viết"
+  "overall_feedback": "Nhận xét tổng quan ngắn gọn về bài viết",
+  "improved_essay": {
+    "content": "Toàn bộ bài luận đã được viết lại ở band điểm cao hơn"
+  }
 }
 ```
 
