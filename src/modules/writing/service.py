@@ -22,7 +22,7 @@ async def evaluate_task1(
     with open(prompt_path, "r", encoding="utf-8") as f:
         prompt_template = f.read()
 
-    provider_type = os.getenv("AI_PROVIDER_TYPE", "openai")
+    provider_type = os.getenv("AI_WRITING_PROVIDER", "openai")
     ai_provider = AIProviderFactory.get_provider(provider_type)
     
     system_prompt = "You are a helpful and expert IELTS examiner."
@@ -103,7 +103,7 @@ async def evaluate_task2(
     with open(prompt_path, "r", encoding="utf-8") as f:
         prompt_template = f.read()
 
-    provider_type = os.getenv("AI_PROVIDER_TYPE", "openai")
+    provider_type = os.getenv("AI_WRITING_PROVIDER", "openai")
     print(f">>> AI_PROVIDER_TYPE: {provider_type}", flush=True)
     ai_provider = AIProviderFactory.get_provider(provider_type)
 

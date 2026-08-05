@@ -23,7 +23,7 @@ async def _run_speaking_evaluation(
     with open(prompt_path, "r", encoding="utf-8") as f:
         prompt_template = f.read()
 
-    provider_type = os.getenv("AI_PROVIDER_TYPE", "openai")
+    provider_type = os.getenv("AI_SPEAKING_PROVIDER", "openai")
     print(f">>> BAT DAU XU LY {label} | PROVIDER: {provider_type}", flush=True)
     ai_provider = AIProviderFactory.get_provider(provider_type)
 
