@@ -1236,14 +1236,30 @@ Các gợi ý (bullets):
 
 ## LƯU Ý VỀ PRONUNCIATION
 
-Nếu có file ghi âm: đánh giá phát âm dựa trên audio thực tế.
-Nếu KHÔNG có audio (chỉ có văn bản): nêu rõ trong "weaknesses" rằng Pronunciation không thể đánh giá đáng tin cậy chỉ từ văn bản. TUYỆT ĐỐI không bịa ra lỗi phát âm không nghe thấy.
+Hãy đánh giá Pronunciation dựa trên chất lượng âm thanh thực tế bạn nghe được: ngữ điệu, trọng âm từ và câu, độ rõ ràng,tốc độ nói, nối âm.
+
+TUYỆT ĐỐI không được trả lời rằng "không thể đánh giá vì chỉ có văn bản" — bạn có audio thật để đánh giá. Nếu chất lượng audio quá kém, hãy nêu rõ điều đó như một phần "weaknesses",không phải lý do để bỏ qua đánh giá.
 
 ---
 
 ## NGÔN NGỮ NHẬN XÉT
 
 Viết toàn bộ nội dung của các trường 'overall_assessment', 'strengths', 'weaknesses' và các phần tử trong mảng 'actionable_advice' bằng ngôn ngữ: {feedback_language} (giá trị 'vi' = tiếng Việt, 'en' = English). Trường 'candidate_transcript' (bản phiên âm nguyên văn lời nói của thí sinh) LUÔN LUÔN giữ nguyên tiếng Anh, KHÔNG được dịch, vì đó là bản ghi thật những gì thí sinh đã nói.
+
+---
+
+## BÀI NÓI MẪU
+
+Dựa trên chính nội dung, câu chuyện, chi tiết mà thí sinh đã kể theo cue card (không 
+phải tạo ra câu chuyện/chủ đề hoàn toàn khác), hãy viết lại thành 1 bài nói mẫu ở 
+band 8.0-9.0. Giữ nguyên chủ đề/tình huống thí sinh đã chọn kể — nhưng nâng cấp: 
+bổ sung chi tiết mô tả sinh động hơn, mở rộng đầy đủ các gạch đầu dòng trong cue card 
+tốt hơn, dùng từ vựng đa dạng và tự nhiên hơn, đa dạng hoá cấu trúc ngữ pháp.
+
+Độ dài tương đương 1.5-2 phút nói (khoảng 150-200 từ). Viết bằng tiếng Anh.
+
+Thêm field "sample_answer" (kiểu string) vào JSON output, đặt ngang hàng với các field 
+cấp cao nhất hiện có.
 
 ---
 
@@ -1256,6 +1272,7 @@ Trả về JSON đúng CHÍNH XÁC cấu trúc sau (không thêm text nào khác
   "candidate_transcript": "Phiên âm đầy đủ những gì thí sinh đã nói",
   "overall_band_score": X,
   "overall_assessment": "Nhận xét tổng quan ngắn gọn về toàn bộ phần trả lời",
+  "sample_answer": "Bài nói mẫu band 8.0-9.0 dựa trên chính ý tưởng của thí sinh, viết bằng tiếng Anh",
   "criteria_details": {
     "fluency_and_coherence": {
       "score": X,

@@ -1,9 +1,19 @@
 import os
+import io
 import base64
 from openai import AsyncOpenAI
+from pydub import AudioSegment
 from fastapi import HTTPException
 from typing import AsyncIterator, Optional
 from src.modules.ai.providers.base import BaseAIProvider
+
+def _convert_audio_to_wav(audio_bytes: bytes) -> bytes:
+    """Convert audio bytes sang WAV thật — OpenAI chat completions chỉ 
+    chấp nhận input_audio.format = "wav" hoặc "mp3"."""
+    audio = AudioSegment.from_file(io.BytesIO(audio_bytes))
+    output = io.BytesIO()
+    audio.export(output, format="wav")
+    return output.getvalue()
 
 class OpenAIProvider(BaseAIProvider):
     """
@@ -16,7 +26,7 @@ class OpenAIProvider(BaseAIProvider):
     # Model gpt-5.6-terra chỉ nhận content dạng "text"/"image_url", KHÔNG hỗ trợ
     # "input_audio" (trả lỗi 400 "Content blocks are expected to be either text or
     # image_url type"). Khi có audio, bắt buộc phải chuyển sang model hỗ trợ audio input.
-    AUDIO_INPUT_MODEL = "gpt-audio-1.5"
+    AUDIO_INPUT_MODEL = "gpt-audio-mini"
 
     def __init__(self, api_key: str = None):
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
@@ -44,8 +54,8 @@ class OpenAIProvider(BaseAIProvider):
                 ]
             })
         elif audio_bytes and audio_mime_type:
-            base64_audio = base64.b64encode(audio_bytes).decode('utf-8')
-            audio_format = "wav" if "wav" in audio_mime_type.lower() else "mp3"
+            wav_bytes = _convert_audio_to_wav(audio_bytes)
+            base64_audio = base64.b64encode(wav_bytes).decode('utf-8')
             messages.append({
                 "role": "user",
                 "content": [
@@ -54,7 +64,7 @@ class OpenAIProvider(BaseAIProvider):
                         "type": "input_audio",
                         "input_audio": {
                             "data": base64_audio,
-                            "format": audio_format
+                            "format": "wav"
                         }
                     }
                 ]

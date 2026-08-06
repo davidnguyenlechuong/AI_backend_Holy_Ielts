@@ -1234,8 +1234,9 @@ Bạn là giám khảo IELTS Speaking chính thức. Hãy NGHE KỸ file ghi âm
 
 ## LƯU Ý VỀ PRONUNCIATION
 
-Nếu có file ghi âm: đánh giá phát âm dựa trên audio thực tế.
-Nếu KHÔNG có audio (chỉ có văn bản): nêu rõ trong "weaknesses" rằng Pronunciation không thể đánh giá đáng tin cậy chỉ từ văn bản. TUYỆT ĐỐI không bịa ra lỗi phát âm không nghe thấy.
+Hãy đánh giá Pronunciation dựa trên chất lượng âm thanh thực tế bạn nghe được: ngữ điệu, trọng âm từ và câu, độ rõ ràng,tốc độ nói, nối âm.
+
+TUYỆT ĐỐI không được trả lời rằng "không thể đánh giá vì chỉ có văn bản" — bạn có audio thật để đánh giá. Nếu chất lượng audio quá kém, hãy nêu rõ điều đó như một phần "weaknesses",không phải lý do để bỏ qua đánh giá.
 
 ---
 
@@ -1243,6 +1244,23 @@ Nếu KHÔNG có audio (chỉ có văn bản): nêu rõ trong "weaknesses" rằn
 
 Viết toàn bộ nội dung của các trường 'overall_assessment', 'strengths', 'weaknesses' và các phần tử trong mảng 'actionable_advice' bằng ngôn ngữ: {feedback_language} (giá trị 'vi' = tiếng Việt, 'en' = English). Trường 'candidate_transcript' (bản phiên âm nguyên văn lời nói của thí sinh) LUÔN LUÔN giữ nguyên tiếng Anh, KHÔNG được dịch, vì đó là bản ghi thật những gì thí sinh đã nói.
 
+---
+## BÀI NÓI MẪU
+
+Dựa trên chính ý tưởng, quan điểm, lập luận mà thí sinh đã trình bày (không phải tạo 
+ra ý tưởng hoàn toàn khác), hãy viết lại thành 1 bài nói mẫu ở band 8.0-9.0. Giữ nguyên 
+quan điểm/lập trường của thí sinh — nhưng nâng cấp: phát triển lập luận sâu hơn, thêm 
+ví dụ/dẫn chứng cụ thể, dùng từ vựng đa dạng và tự nhiên hơn, đa dạng hoá cấu trúc 
+ngữ pháp (câu phức, mệnh đề quan hệ...).
+
+Nếu thí sinh đưa ra quan điểm nào đó, bài mẫu phải giữ đúng quan điểm đó, không được 
+đổi sang lập trường trái ngược.
+
+Độ dài khoảng 4-6 câu, thể hiện khả năng phân tích/so sánh phù hợp với Part 3. 
+Viết bằng tiếng Anh.
+
+Thêm field "sample_answer" (kiểu string) vào JSON output, đặt ngang hàng với các field 
+cấp cao nhất hiện có.
 ---
 
 ## OUTPUT FORMAT
@@ -1254,6 +1272,7 @@ Trả về JSON đúng CHÍNH XÁC cấu trúc sau (không thêm text nào khác
   "candidate_transcript": "Phiên âm đầy đủ những gì thí sinh đã nói",
   "overall_band_score": X,
   "overall_assessment": "Nhận xét tổng quan ngắn gọn về toàn bộ phần trả lời",
+  "sample_answer": "Bài nói mẫu band 8.0-9.0 dựa trên chính ý tưởng của thí sinh, viết bằng tiếng Anh",
   "criteria_details": {
     "fluency_and_coherence": {
       "score": X,
