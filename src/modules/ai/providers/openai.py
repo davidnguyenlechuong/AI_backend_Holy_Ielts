@@ -6,6 +6,11 @@ from pydub import AudioSegment
 from fastapi import HTTPException
 from typing import AsyncIterator, Optional
 from src.modules.ai.providers.base import BaseAIProvider
+from PIL import Image
+import pillow_heif
+import pillow_avif
+
+pillow_heif.register_heif_opener()
 
 def _convert_audio_to_wav(audio_bytes: bytes) -> bytes:
     """Convert audio bytes sang WAV thật — OpenAI chat completions chỉ 
@@ -15,6 +20,25 @@ def _convert_audio_to_wav(audio_bytes: bytes) -> bytes:
     audio.export(output, format="wav")
     return output.getvalue()
 
+def _convert_image_to_png(image_bytes: bytes) -> bytes:
+    """Convert bất kỳ định dạng ảnh nào (AVIF, HEIC, BMP, TIFF...) sang PNG,
+    vì OpenAI chỉ chấp nhận png/jpeg/gif/webp."""
+    try:
+        image = Image.open(io.BytesIO(image_bytes))
+        if image.mode in ("RGBA", "P"):
+            image = image.convert("RGBA")
+        else:
+            image = image.convert("RGB")
+        output = io.BytesIO()
+        image.save(output, format="PNG")
+        return output.getvalue()
+    except Exception:
+        raise HTTPException(
+            status_code=400,
+            detail="File ảnh không hợp lệ hoặc không được hỗ trợ. "
+                   "Vui lòng thử tải lên ảnh định dạng khác (PNG/JPEG)."
+        )
+    
 class OpenAIProvider(BaseAIProvider):
     """
     Provider triển khai việc gọi API tới OpenAI.
@@ -40,7 +64,8 @@ class OpenAIProvider(BaseAIProvider):
         messages = [{"role": "system", "content": system_prompt}]
 
         if image_bytes and mime_type:
-            base64_image = base64.b64encode(image_bytes).decode('utf-8')
+            png_bytes = _convert_image_to_png(image_bytes)
+            base64_image = base64.b64encode(png_bytes).decode('utf-8')
             messages.append({
                 "role": "user",
                 "content": [
@@ -48,7 +73,7 @@ class OpenAIProvider(BaseAIProvider):
                     {
                         "type": "image_url",
                         "image_url": {
-                            "url": f"data:{mime_type};base64,{base64_image}"
+                            "url": f"data:image/png;base64,{base64_image}"
                         }
                     }
                 ]

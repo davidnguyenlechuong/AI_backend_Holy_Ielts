@@ -88,7 +88,7 @@ def parse_ai_json_response(raw_response: str) -> dict[str, Any]:
         pass
 
     # strict=False: cho phép ký tự control (ví dụ newline literal) nằm trong string value,
-    # lỗi rất phổ biến khi LLM sinh JSON có "assessment"/"evidence" nhiều dòng.
+    # lỗi rất phổ biến khi LLM sinh JSON có "comment"/"overall_feedback" nhiều dòng.
     try:
         return json.loads(candidate, strict=False)
     except json.JSONDecodeError:

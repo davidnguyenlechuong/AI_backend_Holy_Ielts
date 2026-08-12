@@ -1247,7 +1247,16 @@ cung cấp audio", hoặc bất kỳ hình thức từ chối đánh giá nào k
 
 ## NGÔN NGỮ NHẬN XÉT
 
-Viết toàn bộ nội dung của các trường 'overall_assessment', 'strengths', 'weaknesses' và các phần tử trong mảng 'actionable_advice' bằng ngôn ngữ: {feedback_language} (giá trị 'vi' = tiếng Việt, 'en' = English). Trường 'candidate_transcript' (bản phiên âm nguyên văn lời nói của thí sinh) LUÔN LUÔN giữ nguyên tiếng Anh, KHÔNG được dịch, vì đó là bản ghi thật những gì thí sinh đã nói.
+Viết bằng ngôn ngữ {feedback_language} (giá trị 'vi' = tiếng Việt, 'en' = English) TOÀN BỘ nội dung của CHÍNH XÁC các field sau, không được sót field nào:
+- 'overall_assessment'
+- TOÀN BỘ các phần tử trong mảng 'strengths' và 'weaknesses' của CẢ 4 tiêu chí trong 'criteria_details' (fluency_and_coherence, lexical_resource, grammatical_range_and_accuracy, pronunciation)
+- TOÀN BỘ các phần tử trong mảng 'actionable_advice'
+
+Các field sau LUÔN LUÔN giữ nguyên tiếng Anh, bất kể {feedback_language} là gì, KHÔNG BAO GIỜ được dịch:
+- 'candidate_transcript' (bản phiên âm nguyên văn lời nói của thí sinh) — vì đó là bản ghi thật những gì thí sinh đã nói.
+- 'sample_answer' (bài nói mẫu) — vì đây là ví dụ câu trả lời nói tiếng Anh dùng để luyện tập, không phải nội dung nhận xét/giải thích.
+
+Đây là yêu cầu BẮT BUỘC — nếu {feedback_language} là 'vi', TOÀN BỘ overall_assessment, strengths, weaknesses, actionable_advice phải viết bằng tiếng Việt hoàn toàn, không được lẫn tiếng Anh (trừ các từ/cụm từ tiếng Anh trích dẫn trực tiếp từ câu trả lời của thí sinh, đặt trong dấu ngoặc kép, ví dụ khi trích lại nguyên văn 1 câu thí sinh đã nói để phân tích lỗi).
 
 ---
 
@@ -1309,3 +1318,5 @@ Trả về JSON đúng CHÍNH XÁC cấu trúc sau (không thêm text nào khác
 ```
 
 LƯU Ý QUAN TRỌNG VỀ TÊN FIELD: phải dùng chính xác "fluency_and_coherence" và "grammatical_range_and_accuracy" (CÓ chữ "and"), dùng "score" (KHÔNG dùng "band"), dùng "strengths"/"weaknesses" dạng mảng (KHÔNG dùng "assessment"/"evidence" dạng chuỗi).
+
+LƯU Ý VỀ NGÔN NGỮ TRONG VÍ DỤ JSON MẪU Ở TRÊN: các placeholder text trong ví dụ JSON (như "Nhận xét tổng quan ngắn gọn về toàn bộ phần trả lời", "Điểm mạnh cụ thể 1"...) CHỈ mang tính minh hoạ CẤU TRÚC field, KHÔNG phải yêu cầu về ngôn ngữ. Nội dung thực tế bắt buộc phải tuân theo đúng quy định ở phần "NGÔN NGỮ NHẬN XÉT" phía trên: viết bằng {feedback_language} cho overall_assessment/strengths/weaknesses/actionable_advice, và LUÔN LUÔN bằng tiếng Anh cho candidate_transcript và sample_answer, bất kể placeholder trong ví dụ đang viết bằng ngôn ngữ nào.

@@ -704,12 +704,128 @@ Bài viết của học viên (Essay):
 - Feedback Language: {feedback_language}
 
 **Lưu ý quan trọng cho Giám khảo:**
-1. Về Target Band: Nếu Target Band > 0, trong phần `overall_feedback` và `assessment` của từng tiêu chí, ngoài việc nhận xét lỗi sai, BẮT BUỘC phải đưa ra những lời khuyên cụ thể và hành động cần thiết (actionable advice) để bài viết này có thể nâng band lên mức {target_band}.
-2. Về Ngôn ngữ nhận xét: Toàn bộ nội dung trả về trong các trường giải thích (`assessment`, `overall_feedback`) BẮT BUỘC PHẢI ĐƯỢC VIẾT BẰNG ngôn ngữ: {feedback_language} (giá trị 'vi' = tiếng Việt, 'en' = English). Trường 'evidence' (trích dẫn nguyên văn từ bài luận của thí sinh) LUÔN LUÔN giữ nguyên tiếng Anh, KHÔNG được dịch, vì đó là câu thật trong bài viết gốc. Key JSON cũng luôn giữ nguyên tiếng Anh, không áp dụng bản dịch.
+1. Về Target Band: Nếu Target Band > 0, trong phần `overall_feedback` và `comment` của từng tiêu chí phụ (sub_criteria), ngoài việc nhận xét lỗi sai, BẮT BUỘC phải đưa ra những lời khuyên cụ thể và hành động cần thiết (actionable advice) để bài viết này có thể nâng band lên mức {target_band}.
+2. Về Ngôn ngữ nhận xét: Toàn bộ nội dung trả về trong các trường giải thích (`comment` trong sub_criteria, `overall_feedback`) BẮT BUỘC PHẢI ĐƯỢC VIẾT BẰNG ngôn ngữ: {feedback_language} (giá trị 'vi' = tiếng Việt, 'en' = English). Trường 'evidence' (trích dẫn nguyên văn từ bài luận của thí sinh) LUÔN LUÔN giữ nguyên tiếng Anh, KHÔNG được dịch, vì đó là câu thật trong bài viết gốc. Key JSON cũng luôn giữ nguyên tiếng Anh, không áp dụng bản dịch.
 
 ---
 
 QUAN TRỌNG - BÀI SỬA MẪU: Sau khi chấm điểm, hãy viết lại TOÀN BỘ bài luận của thí sinh ở mức band cao hơn (Khoảng band 8-9). Giữ NGUYÊN ý tưởng, lập luận và cấu trúc tổng thể của thí sinh nếu thấy hợp lý (có thể thay đổi ý tưởng và lập luận nếu như bài của người dùng quá kém và vụng về), phải cải thiện: từ vựng phong phú hơn, ngữ pháp đa dạng và chính xác hơn, sự mạch lạc/liên kết tốt hơn.
+
+---
+
+## TIÊU CHÍ PHỤ (SUB-CRITERIA) BẮT BUỘC CHO MỖI TIÊU CHÍ LỚN
+
+Mỗi tiêu chí lớn (task_achievement, coherence_cohesion, lexical_resource, grammatical_range_accuracy) PHẢI có thêm field "sub_criteria" — một mảng gồm ĐÚNG 4 object, mỗi object đúng cấu trúc:
+
+```json
+{
+  "name": "Tên tiêu chí phụ (tiếng Anh, giữ nguyên chính xác như danh sách dưới đây)",
+  "comment": "Nhận xét chi tiết bằng {feedback_language} về khía cạnh này trong bài viết",
+  "evidence": ["Trích dẫn NGUYÊN VĂN chính xác 1 đoạn/câu từ bài viết thí sinh minh hoạ cho nhận xét — PHẢI khớp CHÍNH XÁC từng ký tự với bài viết gốc để có thể tìm và highlight được, không được diễn giải lại hay sửa chữ"]
+}
+```
+
+Danh sách tiêu chí phụ CHÍNH XÁC cần dùng (không thêm, không bớt, không đổi tên):
+
+**task_achievement** (4 tiêu chí phụ):
+1. "Task Fulfillment" — Đúng yêu cầu đề, đầy đủ nội dung, không lạc đề hoặc bỏ sót
+2. "Overview & Main Features" — Overview rõ ràng, nêu đúng xu hướng và đặc điểm chính
+3. "Key Feature Selection & Comparison" — Chọn đúng thông tin nổi bật, so sánh và nhóm dữ liệu hợp lý
+4. "Information Accuracy & Development" — Số liệu, xu hướng và thông tin chính xác, được mô tả đủ rõ
+
+**coherence_cohesion** (4 tiêu chí phụ):
+1. "Logical Progression" — Ý nhảy cóc, logic không rõ, mâu thuẫn, thứ tự ý không hợp lý
+2. "Paragraphing & Organization" — Chia đoạn sai, paragraph thiếu focus, topic sentence yếu
+3. "Cohesive Devices" — Linking words sai/thiếu/thừa/lạm dụng
+4. "Referencing & Connection" — Pronoun/reference không rõ, câu/ý không kết nối tốt
+
+**lexical_resource** (4 tiêu chí phụ):
+1. "Vocabulary Range & Repetition" — Từ vựng hạn chế, lặp từ, thiếu paraphrase
+2. "Word Choice & Precision" — Dùng sai từ, từ không đúng nghĩa/ngữ cảnh, register không phù hợp
+3. "Collocation & Word Formation" — Collocation sai, word form sai, phrase không tự nhiên
+4. "Spelling & Lexical Mechanics" — Chính tả, capitalization liên quan từ, dạng viết từ
+
+**grammatical_range_accuracy** (4 tiêu chí phụ):
+1. "Sentence Structure & Range" — Cấu trúc đơn điệu, complex sentence sai, clause structure
+2. "Grammar Accuracy" — Tense, article, agreement, preposition, noun, pronoun...
+3. "Sentence Boundary & Punctuation" — Dấu câu, run-on, comma splice, fragment
+4. "Grammar Error Control" — Lỗi lặp lại, mật độ lỗi, lỗi gây khó hiểu
+
+QUY TẮC BẮT BUỘC:
+- Mỗi tiêu chí lớn PHẢI có ĐÚNG 4 object trong "sub_criteria" — không bỏ sót, không thêm tiêu chí ngoài danh sách trên, không đổi tên "name".
+- Nếu bài viết không có lỗi/điểm đáng chú ý ở 1 tiêu chí phụ nào đó, vẫn PHẢI có "comment" (có thể là nhận xét tích cực), nhưng "evidence" có thể là mảng rỗng [] nếu không có đoạn trích dẫn cụ thể phù hợp.
+- "comment" tuân theo quy tắc ngôn ngữ {feedback_language} giống các field nhận xét khác (overall_feedback).
+- "evidence" trong sub_criteria LUÔN LUÔN là trích dẫn nguyên văn tiếng Anh, khớp CHÍNH XÁC từng ký tự với bài viết gốc của thí sinh (không dịch, không diễn giải, không tự sửa lỗi chính tả/ngữ pháp khi trích dẫn) — mục đích để hệ thống tìm và highlight đúng vị trí trong bài viết.
+
+---
+
+## DANH MỤC LỖI CHI TIẾT (ERROR ANNOTATIONS) BẮT BUỘC CHO MỖI TIÊU CHÍ LỚN
+
+Ngoài "sub_criteria", mỗi tiêu chí lớn (task_achievement, coherence_cohesion, lexical_resource, grammatical_range_accuracy) PHẢI có thêm field "error_annotations" — một mảng các object, mỗi object đúng cấu trúc:
+
+```json
+{
+  "error_type": "Tag ngắn gọn 2-4 từ, Title Case (xem danh sách tham khảo bên dưới)",
+  "category": "Một trong: 'collocation', 'word_form', 'vocabulary', 'grammar', 'punctuation', 'coherence', 'task_response'",
+  "original_text": "Đoạn văn bản NGUYÊN VĂN NGẮN NHẤT CÓ THỂ từ bài viết, chỉ bao gồm CHÍNH XÁC từ/cụm từ chứa lỗi (khớp từng ký tự với bài gốc, để tìm và highlight được) — KHÔNG lấy nguyên cả câu trừ khi lỗi thực sự mang tính cấu trúc toàn câu, xem chi tiết ở mục hướng dẫn bên dưới",
+  "explanation": "Giải thích lỗi này là gì, tại sao sai, viết bằng {feedback_language}",
+  "suggestions": [
+    { "replacement": "Từ/cụm từ thay thế để sửa lỗi", "full_sentence": "Toàn bộ câu sau khi áp dụng cách sửa này" }
+  ],
+  "target_band": X
+}
+```
+
+### YÊU CẦU VỀ ĐỘ TOÀN DIỆN KHI PHÁT HIỆN LỖI
+
+Hãy rà soát bài viết một cách CHI TIẾT và TOÀN DIỆN, không chỉ dừng lại ở các lỗi rõ ràng (sai ngữ pháp, sai từ, sai chính tả...). Đặc biệt chú ý phát hiện các vấn đề tinh tế sau, vốn thường bị bỏ sót nhưng ảnh hưởng đến band điểm:
+
+- Diễn đạt mang tính TUYỆT ĐỐI HOÁ không có căn cứ (absolute claims): các cụm như "countless", "always", "never", "everyone", "no one", "completely", "totally" khi dùng để khẳng định chắc nịch mà không có số liệu/lý do hỗ trợ — nên gợi ý cách diễn đạt có tính học thuật, thận trọng hơn (hedging language) như "a significant amount of", "frequently", "many", "often"...
+- Từ/cụm từ THIẾU CHÍNH XÁC hoặc quá chung chung (vague wording): ví dụ "no movement" thay vì mô tả cụ thể hơn như "minimal physical activity" hoặc "a sedentary lifestyle".
+- Cách diễn đạt mang tính KHẨU NGỮ, thiếu trang trọng (informal language) không phù hợp văn phong học thuật IELTS.
+- LẶP cấu trúc câu hoặc lặp ý theo khuôn mẫu (formulaic/repetitive sentence patterns) dù không sai ngữ pháp.
+- Ý được nêu nhưng CHƯA ĐỦ THUYẾT PHỤC hoặc thiếu giải thích logic (dù không phải lỗi ngữ pháp/từ vựng, vẫn ảnh hưởng band Task Response/Coherence).
+
+### Hướng dẫn "error_type"
+
+Tag NGẮN GỌN (tối đa 2-4 từ), KHÔNG viết thành câu dài hay chèn ví dụ cụ thể vào tên. Ưu tiên dùng CHÍNH XÁC 1 trong các tag tham khảo dưới đây nếu phù hợp; nếu lỗi không khớp tag nào, được tự tạo tag mới nhưng PHẢI giữ đúng phong cách ngắn gọn tương tự.
+
+DANH SÁCH TAG THAM KHẢO (không bắt buộc đóng khung, chỉ để giữ nhất quán):
+
+- Task Response/Coherence: Off Topic, Missing Task Part, Overgeneralization, Exaggeration, Missing Overview, Missing Main Feature, Incorrect Data, Missing Opinion, Unclear Position, Underdeveloped Idea, Unsupported Claim, Missing Support, Irrelevant Example, Idea Repetition, Illogical Progression, Poor Paragraphing, Incorrect Linking Word, Ambiguous Reference
+- Lexical Resource: Basic Word, Word Repetition, Wrong Word Choice, Wrong Collocation, Wrong Word Form, Spelling Error
+- Grammar: Subject-Verb Agreement, Tense Error, Article Error, Preposition Error, Singular/Plural Error, Word Order Error, Sentence Fragment, Run-on Sentence, Comma Splice, Punctuation Error
+
+### Hướng dẫn "category"
+
+LUÔN LUÔN phải là 1 trong 7 giá trị cố định: 'collocation', 'word_form', 'vocabulary', 'grammar', 'punctuation', 'coherence', 'task_response'. Đây là field bắt buộc dùng để đếm/nhóm lỗi theo từng tiêu chí lớn ở giao diện, KHÔNG được bỏ qua hoặc tự tạo giá trị khác.
+
+### Hướng dẫn "original_text" — PHẢI NGẮN NHẤT CÓ THỂ, CHỈ ĐÚNG PHẦN LỖI
+
+"original_text" CHỈ được chứa đúng từ/cụm từ gây ra lỗi, KHÔNG bao gồm phần câu xung quanh không liên quan đến lỗi. Đây là quy tắc BẮT BUỘC để giao diện highlight chính xác, không rối mắt.
+
+Ví dụ: nếu lỗi là dùng từ "super fun" không phù hợp văn phong học thuật trong câu "discovering a new place to study with a different atmosphere is super fun", "original_text" CHỈ được là "is super fun", KHÔNG được lấy nguyên cả cụm "with a different atmosphere is super fun" hay cả câu.
+
+Nguyên tắc xác định phạm vi "original_text":
+- Lỗi từ vựng/collocation đơn lẻ (1 từ sai) → "original_text" chỉ là từ đó.
+- Lỗi collocation 2 từ đi cùng nhau (verb-noun, adj-noun...) → "original_text" là đúng cụm 2-3 từ đó, không hơn.
+- Lỗi ngữ pháp cục bộ (thì sai, mạo từ sai, giới từ sai) → "original_text" chỉ là từ hoặc cụm từ ngắn chứa lỗi ngữ pháp đó (ví dụ chỉ "a student" nếu lỗi là thiếu "students'", không lấy cả câu).
+- CHỈ trường hợp lỗi mang tính cấu trúc toàn câu (câu quá đơn giản, thiếu liên kết giữa 2 câu, câu rời rạc...) mới được phép lấy nguyên câu hoặc 2 câu làm "original_text".
+
+### Hướng dẫn "suggestions"
+
+Cung cấp 2-3 phương án sửa khác nhau khi hợp lý (VD nhiều từ đồng nghĩa phù hợp để thay từ bị lặp), tối thiểu 1 phương án.
+
+### Hướng dẫn "target_band"
+
+Band số mà nếu sửa được lỗi này, bài viết có thể tiệm cận cho tiêu chí lớn chứa nó.
+
+### QUY TẮC BẮT BUỘC
+
+- Nếu 1 tiêu chí lớn không có lỗi đáng chú ý, "error_annotations" có thể là mảng rỗng [].
+- "original_text" LUÔN LUÔN là trích dẫn nguyên văn tiếng Anh, khớp CHÍNH XÁC từng ký tự với bài viết gốc của thí sinh — không dịch, không diễn giải, không tự sửa lỗi chính tả/ngữ pháp khi trích dẫn — VÀ phải NGẮN NHẤT CÓ THỂ theo đúng nguyên tắc ở mục "Hướng dẫn original_text" phía trên.
+- "explanation" tuân theo quy tắc ngôn ngữ {feedback_language} giống các field nhận xét khác (overall_feedback, comment trong sub_criteria).
+- "error_annotations" là field BỔ SUNG THÊM, hoàn toàn độc lập và song song với "sub_criteria" — không thay thế, không làm mất hay trùng lặp nội dung của "sub_criteria".
 
 ---
 
@@ -719,10 +835,54 @@ Dựa vào các tiêu chí ở trên, hãy chấm bài luận và trả về JSO
 
 ```json
 {
-  "task_achievement": { "band": X, "assessment": "...", "evidence": ["...", "...", "..."] },
-  "coherence_cohesion": { "band": X, "assessment": "...", "evidence": ["...", "...", "..."] },
-  "lexical_resource": { "band": X, "assessment": "...", "evidence": ["...", "...", "..."] },
-  "grammatical_range_accuracy": { "band": X, "assessment": "...", "evidence": ["...", "...", "..."] },
+  "task_achievement": {
+    "band": X,
+    "error_annotations": [
+      { "error_type": "Wrong Collocation", "category": "collocation", "original_text": "...", "explanation": "...", "suggestions": [ { "replacement": "...", "full_sentence": "..." } ], "target_band": X }
+    ],
+    "sub_criteria": [
+      { "name": "Task Fulfillment", "comment": "...", "evidence": ["..."] },
+      { "name": "Overview & Main Features", "comment": "...", "evidence": ["..."] },
+      { "name": "Key Feature Selection & Comparison", "comment": "...", "evidence": ["..."] },
+      { "name": "Information Accuracy & Development", "comment": "...", "evidence": ["..."] }
+    ]
+  },
+  "coherence_cohesion": {
+    "band": X,
+    "error_annotations": [
+      { "error_type": "Incorrect Linking Word", "category": "coherence", "original_text": "...", "explanation": "...", "suggestions": [ { "replacement": "...", "full_sentence": "..." } ], "target_band": X }
+    ],
+    "sub_criteria": [
+      { "name": "Logical Progression", "comment": "...", "evidence": ["..."] },
+      { "name": "Paragraphing & Organization", "comment": "...", "evidence": ["..."] },
+      { "name": "Cohesive Devices", "comment": "...", "evidence": ["..."] },
+      { "name": "Referencing & Connection", "comment": "...", "evidence": ["..."] }
+    ]
+  },
+  "lexical_resource": {
+    "band": X,
+    "error_annotations": [
+      { "error_type": "Wrong Word Choice", "category": "vocabulary", "original_text": "...", "explanation": "...", "suggestions": [ { "replacement": "...", "full_sentence": "..." } ], "target_band": X }
+    ],
+    "sub_criteria": [
+      { "name": "Vocabulary Range & Repetition", "comment": "...", "evidence": ["..."] },
+      { "name": "Word Choice & Precision", "comment": "...", "evidence": ["..."] },
+      { "name": "Collocation & Word Formation", "comment": "...", "evidence": ["..."] },
+      { "name": "Spelling & Lexical Mechanics", "comment": "...", "evidence": ["..."] }
+    ]
+  },
+  "grammatical_range_accuracy": {
+    "band": X,
+    "error_annotations": [
+      { "error_type": "Tense Error", "category": "grammar", "original_text": "...", "explanation": "...", "suggestions": [ { "replacement": "...", "full_sentence": "..." } ], "target_band": X }
+    ],
+    "sub_criteria": [
+      { "name": "Sentence Structure & Range", "comment": "...", "evidence": ["..."] },
+      { "name": "Grammar Accuracy", "comment": "...", "evidence": ["..."] },
+      { "name": "Sentence Boundary & Punctuation", "comment": "...", "evidence": ["..."] },
+      { "name": "Grammar Error Control", "comment": "...", "evidence": ["..."] }
+    ]
+  },
   "overall_band": X,
   "overall_feedback": "Nhận xét tổng quan ngắn gọn về bài viết",
   "improved_essay": {
@@ -731,4 +891,4 @@ Dựa vào các tiêu chí ở trên, hãy chấm bài luận và trả về JSO
 }
 ```
 
-QUAN TRỌNG: Field 'evidence' PHẢI là một MẢNG (array) gồm 2-4 câu trích dẫn NGẮN GỌN, riêng biệt từ bài làm của thí sinh - mỗi phần tử là 1 trích dẫn độc lập, không dài quá 1-2 câu. KHÔNG viết thành 1 đoạn văn dài duy nhất.
+QUAN TRỌNG: Mỗi tiêu chí lớn (task_achievement, coherence_cohesion, lexical_resource, grammatical_range_accuracy) CHỈ gồm đúng 3 field "band", "error_annotations" và "sub_criteria" — KHÔNG được thêm field "assessment" hay "evidence" ở cấp này nữa, toàn bộ nhận xét chi tiết và trích dẫn nằm bên trong từng object của "sub_criteria"/"error_annotations". Field 'evidence' bên trong mỗi object của 'sub_criteria' PHẢI là một MẢNG (array), có thể là mảng rỗng [] nếu không có trích dẫn phù hợp; nếu có, mỗi phần tử là 1 trích dẫn NGUYÊN VĂN khớp chính xác với bài viết gốc. "error_annotations" có thể là mảng rỗng [] nếu tiêu chí đó không có lỗi đáng chú ý.
