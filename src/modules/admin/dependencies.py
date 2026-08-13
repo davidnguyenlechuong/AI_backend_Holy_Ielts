@@ -1,1 +1,1 @@
-﻿# dependencies.py cho module admin
+# dependencies.py cho module admin

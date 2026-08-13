@@ -1,1 +1,1 @@
-﻿# constants.py cho module auth
+# constants.py cho module auth

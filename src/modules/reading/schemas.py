@@ -1,1 +1,1 @@
-﻿# schemas.py cho module reading
+# schemas.py cho module reading

@@ -1,1 +1,1 @@
-﻿# __init__.py cho module writing
+# __init__.py cho module writing

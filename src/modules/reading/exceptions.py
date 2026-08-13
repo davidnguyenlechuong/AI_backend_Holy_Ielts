@@ -1,1 +1,1 @@
-﻿# exceptions.py cho module reading
+# exceptions.py cho module reading

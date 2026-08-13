@@ -1,1 +1,1 @@
-﻿# schemas.py cho module uploads
+# schemas.py cho module uploads

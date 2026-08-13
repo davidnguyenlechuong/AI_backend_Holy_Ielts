@@ -1,1 +1,1 @@
-﻿# constants.py cho module speaking
+# constants.py cho module speaking

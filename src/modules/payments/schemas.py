@@ -1,1 +1,1 @@
-﻿# schemas.py cho module payments
+# schemas.py cho module payments

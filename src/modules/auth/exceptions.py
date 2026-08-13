@@ -1,1 +1,1 @@
-﻿# exceptions.py cho module auth
+# exceptions.py cho module auth

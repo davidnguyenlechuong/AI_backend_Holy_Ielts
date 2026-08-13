@@ -1,1 +1,1 @@
-﻿# dependencies.py cho module uploads
+# dependencies.py cho module uploads

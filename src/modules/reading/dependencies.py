@@ -1,1 +1,1 @@
-﻿# dependencies.py cho module reading
+# dependencies.py cho module reading

@@ -1,1 +1,1 @@
-﻿# dependencies.py cho module speaking
+# dependencies.py cho module speaking

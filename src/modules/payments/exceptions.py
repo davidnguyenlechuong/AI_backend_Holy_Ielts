@@ -1,1 +1,1 @@
-﻿# exceptions.py cho module payments
+# exceptions.py cho module payments

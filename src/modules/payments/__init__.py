@@ -1,1 +1,1 @@
-﻿# __init__.py cho module payments
+# __init__.py cho module payments

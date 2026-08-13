@@ -1,1 +1,1 @@
-﻿# __init__.py cho module users
+# __init__.py cho module users

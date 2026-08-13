@@ -1,1 +1,1 @@
-﻿# dependencies.py cho module listening
+# dependencies.py cho module listening

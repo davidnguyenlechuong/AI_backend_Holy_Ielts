@@ -1,1 +1,5 @@
-﻿# Import Base va tat ca cac Model de Alembic nhan dien
+from sqlalchemy.orm import DeclarativeBase
+from datetime import datetime, timezone
+
+class Base(DeclarativeBase):
+    pass

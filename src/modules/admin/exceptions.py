@@ -1,1 +1,1 @@
-﻿# exceptions.py cho module admin
+# exceptions.py cho module admin

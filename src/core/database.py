@@ -1,1 +1,1 @@
-﻿# Cau hinh SQLAlchemy engine va session
+# Cau hinh SQLAlchemy engine va session

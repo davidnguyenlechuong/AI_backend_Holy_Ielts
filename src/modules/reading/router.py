@@ -1,1 +1,1 @@
-﻿# router.py cho module reading
+# router.py cho module reading

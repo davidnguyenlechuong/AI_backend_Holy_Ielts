@@ -1,1 +1,1 @@
-﻿# constants.py cho module admin
+# constants.py cho module admin

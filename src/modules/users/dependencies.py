@@ -1,1 +1,1 @@
-﻿# dependencies.py cho module users
+# dependencies.py cho module users

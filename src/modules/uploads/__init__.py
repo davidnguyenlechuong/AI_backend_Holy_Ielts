@@ -1,1 +1,1 @@
-﻿# __init__.py cho module uploads
+# __init__.py cho module uploads

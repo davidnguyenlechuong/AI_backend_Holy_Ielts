@@ -1,1 +1,1 @@
-﻿# constants.py cho module reading
+# constants.py cho module reading

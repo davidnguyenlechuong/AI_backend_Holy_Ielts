@@ -1,1 +1,1 @@
-﻿# __init__.py cho module speaking
+# __init__.py cho module speaking

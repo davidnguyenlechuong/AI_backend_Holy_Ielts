@@ -1,1 +1,1 @@
-﻿# schemas.py cho module admin
+# schemas.py cho module admin

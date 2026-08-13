@@ -1,1 +1,1 @@
-﻿# exceptions.py cho module uploads
+# exceptions.py cho module uploads

@@ -1,1 +1,1 @@
-﻿# exceptions.py cho module speaking
+# exceptions.py cho module speaking

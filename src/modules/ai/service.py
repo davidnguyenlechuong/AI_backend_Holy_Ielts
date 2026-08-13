@@ -1,1 +1,1 @@
-﻿# service.py cho module ai
+# service.py cho module ai

@@ -1,1 +1,1 @@
-﻿# service.py cho module reading
+# service.py cho module reading

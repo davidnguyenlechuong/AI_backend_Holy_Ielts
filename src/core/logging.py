@@ -1,1 +1,1 @@
-﻿# Setup Python Logging
+# Setup Python Logging

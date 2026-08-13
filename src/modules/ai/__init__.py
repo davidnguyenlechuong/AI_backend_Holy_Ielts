@@ -1,1 +1,1 @@
-﻿# __init__.py cho module ai
+# __init__.py cho module ai

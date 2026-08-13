@@ -1,1 +1,1 @@
-﻿# schemas.py cho module ai
+# schemas.py cho module ai

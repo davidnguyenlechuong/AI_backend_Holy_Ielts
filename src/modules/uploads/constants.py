@@ -1,1 +1,1 @@
-﻿# constants.py cho module uploads
+# constants.py cho module uploads

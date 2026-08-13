@@ -1,1 +1,1 @@
-﻿# dependencies.py cho module auth
+# dependencies.py cho module auth

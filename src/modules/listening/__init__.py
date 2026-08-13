@@ -1,1 +1,1 @@
-﻿# __init__.py cho module listening
+# __init__.py cho module listening

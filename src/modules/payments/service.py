@@ -1,1 +1,1 @@
-﻿# service.py cho module payments
+# service.py cho module payments

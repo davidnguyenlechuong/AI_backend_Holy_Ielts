@@ -1,1 +1,1 @@
-﻿# Quan ly startup/shutdown event cua ung dung
+# Quan ly startup/shutdown event cua ung dung

@@ -1,1 +1,1 @@
-﻿# dependencies.py cho module payments
+# dependencies.py cho module payments

@@ -1,1 +1,1 @@
-﻿# dependencies.py cho module writing
+# dependencies.py cho module writing

@@ -1,6 +1,6 @@
 import os
 from fastapi import HTTPException
-from src.modules.ai.factory import AIProviderFactory
+from src.ai.factory import AIProviderFactory
 from src.shared.utils.json_extractor import parse_ai_json_response
 from pathlib import Path
 

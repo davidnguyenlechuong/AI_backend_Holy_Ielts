@@ -1,1 +1,1 @@
-﻿# constants.py cho module payments
+# constants.py cho module payments
