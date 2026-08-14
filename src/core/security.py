@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+import hashlib
 from typing import Optional
 from passlib.context import CryptContext
 from jose import JWTError, jwt
@@ -31,3 +32,8 @@ def create_refresh_token(data: dict, expires_delta: Optional[timedelta] = None) 
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
+def hash_token(token: str) -> str:
+    """Băm refresh token bằng SHA-256 trước khi lưu vào DB. Dùng SHA-256 thay vì 
+    argon2 vì JWT đã có entropy cao sẵn (không cần thuật toán chống brute-force 
+    chậm như cho password), và cần verify nhanh mỗi lần refresh."""
+    return hashlib.sha256(token.encode()).hexdigest()

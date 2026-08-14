@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from datetime import datetime, timedelta, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from src.db.dependencies import get_db
 from src.models.auth import User, RefreshToken, AuthAccount
-from src.core.security import get_password_hash, verify_password, create_access_token, create_refresh_token
+from src.core.security import get_password_hash, verify_password, create_access_token, create_refresh_token, hash_token
 from src.core.config import settings
 from src.modules.auth.schemas import UserCreate, UserLogin, TokenResponse, RefreshTokenRequest, GoogleAuthRequest
 
@@ -26,7 +27,11 @@ async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
     access_token = create_access_token(data={"sub": str(new_user.id)})
     refresh_token = create_refresh_token(data={"sub": str(new_user.id)})
     
-    db_refresh_token = RefreshToken(user_id=new_user.id, token_hash=refresh_token, expires_at=new_user.created_at)
+    db_refresh_token = RefreshToken(
+    user_id=new_user.id,
+    token_hash=hash_token(refresh_token),
+    expires_at=datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+)
     db.add(db_refresh_token)
     await db.commit()
     
@@ -42,7 +47,11 @@ async def login(user_in: UserLogin, db: AsyncSession = Depends(get_db)):
     access_token = create_access_token(data={"sub": str(user.id)})
     refresh_token = create_refresh_token(data={"sub": str(user.id)})
     
-    db_refresh_token = RefreshToken(user_id=user.id, token_hash=refresh_token, expires_at=user.created_at)
+    db_refresh_token = RefreshToken(
+    user_id=user.id,
+    token_hash=hash_token(refresh_token),
+    expires_at=datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+)
     db.add(db_refresh_token)
     await db.commit()
     
@@ -85,7 +94,11 @@ async def google_login(request_data: GoogleAuthRequest, db: AsyncSession = Depen
         access_token = create_access_token(data={"sub": str(user.id)})
         refresh_token = create_refresh_token(data={"sub": str(user.id)})
         
-        db_refresh_token = RefreshToken(user_id=user.id, token_hash=refresh_token, expires_at=user.created_at)
+        db_refresh_token = RefreshToken(
+    user_id=user.id,
+    token_hash=hash_token(refresh_token),
+    expires_at=datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+)
         db.add(db_refresh_token)
         await db.commit()
         
