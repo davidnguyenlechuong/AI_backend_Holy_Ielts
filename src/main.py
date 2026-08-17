@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 from src.modules.writing.router import router as writing_router
 from src.modules.speaking.router import router as speaking_router
 from src.modules.auth.router import router as auth_router
+from src.modules.payments.router import router as payments_router
+from src.modules.users.router import router as users_router
 from src.shared.responses.base import ErrorResponseSchema, ErrorContent, ErrorDetails
 
 # Tự động load các biến môi trường từ file .env
@@ -72,6 +74,8 @@ app.add_middleware(
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(writing_router, prefix="/api/v1")
 app.include_router(speaking_router, prefix="/api/v1")
+app.include_router(payments_router, prefix="/api/v1")
+app.include_router(users_router, prefix="/api/v1")
 
 @app.get("/")
 def read_root():

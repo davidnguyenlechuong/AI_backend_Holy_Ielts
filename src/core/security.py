@@ -33,7 +33,11 @@ def create_refresh_token(data: dict, expires_delta: Optional[timedelta] = None) 
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 def hash_token(token: str) -> str:
-    """Băm refresh token bằng SHA-256 trước khi lưu vào DB. Dùng SHA-256 thay vì 
-    argon2 vì JWT đã có entropy cao sẵn (không cần thuật toán chống brute-force 
+    """Băm refresh token bằng SHA-256 trước khi lưu vào DB. Dùng SHA-256 thay vì
+    argon2 vì JWT đã có entropy cao sẵn (không cần thuật toán chống brute-force
     chậm như cho password), và cần verify nhanh mỗi lần refresh."""
     return hashlib.sha256(token.encode()).hexdigest()
+
+def decode_access_token(token: str) -> dict:
+    """Giải mã và verify JWT. Raise jose.JWTError nếu invalid/expired."""
+    return jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
