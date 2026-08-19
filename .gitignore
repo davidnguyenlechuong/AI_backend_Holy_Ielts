@@ -15,6 +15,7 @@ __pycache__/
 *$py.class
 *.so
 .Python
+*.pyc
 
 # Log files
 *.log
@@ -28,3 +29,10 @@ __pycache__/
 # MacOS / OS files
 .DS_Store
 Thumbs.db
+
+# Database & Testing Cache
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+.pytest_cache/

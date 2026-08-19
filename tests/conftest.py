@@ -8,14 +8,35 @@ from src.db.dependencies import get_db
 from src.db.base import Base
 import src.models
 
-# In-memory SQLite for testing
-TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
+from sqlalchemy.pool import StaticPool
+import sqlalchemy as sa
+
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.types import UUID as BaseUUID
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+
+@compiles(BaseUUID, "sqlite")
+def compile_uuid_sqlite(type_, compiler, **kw):
+    return "CHAR(36)"
+
+@compiles(PG_UUID, "sqlite")
+def compile_uuid_pg_sqlite(type_, compiler, **kw):
+    return "CHAR(36)"
+
+# File-based SQLite for testing to prevent connection isolation issues
+TEST_DATABASE_URL = "sqlite+aiosqlite:///test_dev.db"
 
 engine = create_async_engine(
     TEST_DATABASE_URL,
     connect_args={"check_same_thread": False}
 )
-TestingSessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)
+TestingSessionLocal = async_sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine,
+    class_=AsyncSession,
+    expire_on_commit=False
+)
 
 async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
     async with TestingSessionLocal() as session:
@@ -34,6 +55,8 @@ async def db_setup_teardown():
     # Setup
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        result = await conn.execute(sa.text("SELECT name FROM sqlite_master WHERE type='table'"))
+        print("ACTUAL TABLES IN DB AFTER CREATE_ALL:", result.scalars().all())
     yield
     # Teardown
     async with engine.begin() as conn:

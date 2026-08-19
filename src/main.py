@@ -10,6 +10,9 @@ from src.modules.speaking.router import router as speaking_router
 from src.modules.auth.router import router as auth_router
 from src.modules.payments.router import router as payments_router
 from src.modules.users.router import router as users_router
+from src.modules.library.router import router as library_router
+from src.modules.admin.router import router as admin_router
+from src.modules.practice.router import router as practice_router
 from src.shared.responses.base import ErrorResponseSchema, ErrorContent, ErrorDetails
 
 # Tự động load các biến môi trường từ file .env
@@ -76,6 +79,9 @@ app.include_router(writing_router, prefix="/api/v1")
 app.include_router(speaking_router, prefix="/api/v1")
 app.include_router(payments_router, prefix="/api/v1")
 app.include_router(users_router, prefix="/api/v1")
+app.include_router(library_router, prefix="/api/v1")
+app.include_router(admin_router, prefix="/api/v1")
+app.include_router(practice_router, prefix="/api/v1")
 
 @app.get("/")
 def read_root():
