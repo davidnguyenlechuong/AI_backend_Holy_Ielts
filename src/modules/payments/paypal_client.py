@@ -58,6 +58,7 @@ async def capture_order(paypal_order_id: str) -> dict:
         resp = await client.post(
             f"{_api_base()}/v2/checkout/orders/{paypal_order_id}/capture",
             headers={"Authorization": f"Bearer {token}"},
+            json={},
         )
         resp.raise_for_status()
         return resp.json()

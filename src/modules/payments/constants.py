@@ -6,7 +6,7 @@ ORDER_STATUS_CANCELED = "CANCELED"
 # Placeholder single plan — real pricing is a pending business decision.
 PLAN_PREMIUM_1M = "PREMIUM_1M"
 PLAN_PRICE_VND = {
-    PLAN_PREMIUM_1M: 99_000,  # PLACEHOLDER PRICE
+    PLAN_PREMIUM_1M: 1_000,  # PLACEHOLDER PRICE — lowered for live-money test payments
 }
 PLAN_PREMIUM_DAYS = {
     PLAN_PREMIUM_1M: 30,
