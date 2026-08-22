@@ -1,8 +1,11 @@
 import json
 import uuid
+from datetime import datetime
 from typing import Dict, List, Optional
-from pydantic import field_validator, model_validator
+
+from pydantic import Field, field_validator, model_validator
 from src.shared.base.schema import BaseSchema
+
 
 class TagResponseSchema(BaseSchema):
     code: str
@@ -73,3 +76,25 @@ class StartAttemptResponseSchema(BaseSchema):
     exam_id: uuid.UUID
     started_at: str
     status: str
+
+
+class ExamAttemptResponseSchema(BaseSchema):
+    id: uuid.UUID
+    examId: uuid.UUID = Field(alias="exam_id")
+    status: str
+    startedAt: str = Field(alias="started_at")
+    submittedAt: Optional[str] = Field(None, alias="submitted_at")
+
+    @field_validator("startedAt", "submittedAt", mode="before")
+    @classmethod
+    def format_dt(cls, v):
+        if isinstance(v, datetime):
+            return v.isoformat(timespec='milliseconds').replace('+00:00', 'Z')
+        return v
+
+    model_config = {"from_attributes": True, "populate_by_name": True}
+
+
+class ExamAttemptDetailResponseSchema(ExamAttemptResponseSchema):
+    exam: Optional[ExamResponseSchema] = None
+

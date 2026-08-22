@@ -18,7 +18,9 @@ from src.shared.responses.base import ResponseSchema
 from src.shared.base.schema import BaseSchema
 from pydantic import Field
 from datetime import datetime, timezone
-from sqlalchemy import select
+from sqlalchemy import select, func, or_
+from sqlalchemy.orm import joinedload
+
 
 class SubmitAttemptRequest(BaseSchema):
     answerText: Optional[str] = None   # Writing / Speaking transcript
@@ -30,6 +32,8 @@ class AttemptResponse(BaseSchema):
     status: str
     questionId: Optional[uuid.UUID] = Field(None, alias="question_id")
     examId: Optional[uuid.UUID] = Field(None, alias="exam_id")
+    answerText: Optional[str] = Field(None, alias="answer_text")
+    audioUrl: Optional[str] = Field(None, alias="audio_url")
     startedAt: str = Field(alias="started_at")
     submittedAt: Optional[str] = Field(None, alias="submitted_at")
 
@@ -44,11 +48,47 @@ class AttemptResponse(BaseSchema):
             "status": attempt.status,
             "question_id": attempt.question_id,
             "exam_id": attempt.exam_id,
+            "answer_text": attempt.answer_text,
+            "audio_url": attempt.audio_url,
             "started_at": fmt(attempt.started_at),
             "submitted_at": fmt(attempt.submitted_at),
         })
 
     model_config = {"from_attributes": True, "populate_by_name": True}
+
+
+class AttemptDetailResponse(AttemptResponse):
+    question: Optional[IeltsQuestionResponse] = None
+    exam: Optional[IeltsExamResponse] = None
+
+    @classmethod
+    def from_orm_obj_detail(cls, attempt: IeltsAttempt, exam_svc: AdminExamService):
+        def fmt(dt):
+            if dt is None:
+                return None
+            return dt.isoformat(timespec='milliseconds').replace('+00:00', 'Z')
+
+        q_data = None
+        if attempt.question:
+            q_data = IeltsQuestionResponse.model_validate(attempt.question)
+
+        e_data = None
+        if attempt.exam:
+            e_data = exam_svc._build_exam_response(attempt.exam)
+
+        return cls.model_validate({
+            "id": attempt.id,
+            "status": attempt.status,
+            "question_id": attempt.question_id,
+            "exam_id": attempt.exam_id,
+            "answer_text": attempt.answer_text,
+            "audio_url": attempt.audio_url,
+            "started_at": fmt(attempt.started_at),
+            "submitted_at": fmt(attempt.submitted_at),
+            "question": q_data,
+            "exam": e_data,
+        })
+
 
 
 router = APIRouter(prefix="/practice", tags=["Practice"])
@@ -236,3 +276,129 @@ async def submit_attempt(
         message="Nộp bài thành công",
         data=AttemptResponse.from_orm_obj(attempt),
     )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# GET /practice/attempts — Lấy danh sách lượt làm bài của User (Auth)
+# ─────────────────────────────────────────────────────────────────────────────
+
+@router.get(
+    "/attempts",
+    response_model=ResponseSchema,
+    status_code=status.HTTP_200_OK,
+)
+async def list_user_attempts(
+    page: int = Query(1, ge=1),
+    pageSize: int = Query(10, ge=1, le=100),
+    skill: Optional[str] = Query(None, description="WRITING | SPEAKING"),
+    status: Optional[str] = Query(None, description="IN_PROGRESS | SUBMITTED | GRADED"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Lấy danh sách bài làm (attempts) của học viên hiện tại.
+    Hỗ trợ phân trang, lọc theo status và skill (WRITING/SPEAKING).
+    """
+    from src.models.ielts import IeltsQuestion, IeltsExam, IeltsExamQuestion
+    from sqlalchemy.orm import aliased
+
+    # Query cơ bản
+    query = select(IeltsAttempt).where(IeltsAttempt.user_id == current_user.id)
+
+    if status:
+        query = query.where(IeltsAttempt.status == status.upper())
+
+    if skill:
+        # Join question trực tiếp và question gián tiếp qua exam để filter skill
+        q_direct = aliased(IeltsQuestion)
+        q_indirect = aliased(IeltsQuestion)
+
+        query = (
+            query
+            .outerjoin(q_direct, IeltsAttempt.question_id == q_direct.id)
+            .outerjoin(IeltsExam, IeltsAttempt.exam_id == IeltsExam.id)
+            .outerjoin(IeltsExamQuestion, IeltsExam.id == IeltsExamQuestion.exam_id)
+            .outerjoin(q_indirect, IeltsExamQuestion.question_id == q_indirect.id)
+            .where(
+                or_(
+                    q_direct.skill == skill.upper(),
+                    q_indirect.skill == skill.upper()
+                )
+            )
+        )
+
+    # Đếm số lượng tổng trước khi paginate
+    count_query = select(func.count()).select_from(query.distinct().subquery())
+    count_result = await db.execute(count_query)
+    total = count_result.scalar_one()
+
+    # Sắp xếp và phân trang
+    query = query.order_by(IeltsAttempt.started_at.desc())
+    query = query.offset((page - 1) * pageSize).limit(pageSize)
+
+    # Load kèm dữ liệu liên quan
+    query = query.options(
+        joinedload(IeltsAttempt.question),
+        joinedload(IeltsAttempt.exam).joinedload(IeltsExam.question_links).joinedload(IeltsExamQuestion.question)
+    )
+
+    result = await db.execute(query)
+    attempts = result.unique().scalars().all()
+
+    exam_svc = AdminExamService(db)
+    items = [AttemptDetailResponse.from_orm_obj_detail(att, exam_svc) for att in attempts]
+
+    return ResponseSchema(
+        success=True,
+        message="Thành công",
+        data={
+            "items": items,
+            "total": total,
+            "page": page,
+            "pageSize": pageSize,
+        }
+    )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# GET /practice/attempts/:id — Lấy chi tiết lịch sử một lượt làm bài (Auth)
+# ─────────────────────────────────────────────────────────────────────────────
+
+@router.get(
+    "/attempts/{attempt_id}",
+    response_model=ResponseSchema,
+    status_code=status.HTTP_200_OK,
+)
+async def get_user_attempt_detail(
+    attempt_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Lấy chi tiết một lượt làm bài kèm theo nội dung câu hỏi/đề bài."""
+    from src.models.ielts import IeltsExam, IeltsExamQuestion
+
+    result = await db.execute(
+        select(IeltsAttempt)
+        .where(
+            IeltsAttempt.id == attempt_id,
+            IeltsAttempt.user_id == current_user.id,
+        )
+        .options(
+            joinedload(IeltsAttempt.question),
+            joinedload(IeltsAttempt.exam).joinedload(IeltsExam.question_links).joinedload(IeltsExamQuestion.question)
+        )
+    )
+    attempt = result.scalars().first()
+    if not attempt:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Bài làm không tồn tại hoặc không thuộc về bạn"
+        )
+
+    exam_svc = AdminExamService(db)
+    return ResponseSchema(
+        success=True,
+        message="Thành công",
+        data=AttemptDetailResponse.from_orm_obj_detail(attempt, exam_svc)
+    )
+
