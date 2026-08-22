@@ -40,6 +40,12 @@ class Settings(BaseSettings):
     PAYPAL_CLIENT_SECRET: Optional[str] = None
     PAYPAL_ENV: str = "sandbox"  # "sandbox" or "live"
 
+    # Supabase / Local Storage Upload Configuration
+    SUPABASE_URL: Optional[str] = None
+    SUPABASE_KEY: Optional[str] = None
+    SUPABASE_BUCKET: str = "ielts-images"
+    UPLOAD_DIR: str = "uploads"  # Local upload fallback directory if Supabase is not configured
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
 settings = Settings()
