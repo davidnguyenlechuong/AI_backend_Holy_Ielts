@@ -13,17 +13,27 @@ from src.modules.users.router import router as users_router
 from src.modules.library.router import router as library_router
 from src.modules.admin.router import router as admin_router
 from src.modules.practice.router import router as practice_router
+from src.modules.uploads.router import router as uploads_router
 from src.shared.responses.base import ErrorResponseSchema, ErrorContent, ErrorDetails
+from src.core.config import settings
+from fastapi.staticfiles import StaticFiles
+import os
 
 # Tự động load các biến môi trường từ file .env
 load_dotenv()
 
 
 app = FastAPI(
-    title="IELTS AI API",
+    title="IELTS AI Platform",
     description="Backend API cho ứng dụng luyện thi IELTS bằng AI",
     version="1.0.0"
 )
+
+# Đảm bảo thư mục upload tồn tại và mount làm static folder phục vụ upload fallback
+if not os.path.exists(settings.UPLOAD_DIR):
+    os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+app.mount("/static/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="static_uploads")
+
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
@@ -56,7 +66,7 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         else:
             details = [ErrorDetails(field="server", message=[message])]
     else:
-        message = str(detail)
+        message = detail
         details = [ErrorDetails(field="server", message=[message])]
 
     error_resp = ErrorResponseSchema(
@@ -100,6 +110,7 @@ app.include_router(users_router, prefix="/api/v1")
 app.include_router(library_router, prefix="/api/v1")
 app.include_router(admin_router, prefix="/api/v1")
 app.include_router(practice_router, prefix="/api/v1")
+app.include_router(uploads_router, prefix="/api/v1")
 
 @app.get("/")
 def read_root():
