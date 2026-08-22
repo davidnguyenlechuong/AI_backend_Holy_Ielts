@@ -42,13 +42,31 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    detail = exc.detail
+    message = "Đã xảy ra lỗi"
+    message_code = "HTTP_ERROR"
+    details = []
+
+    if isinstance(detail, dict):
+        message = detail.get("message", message)
+        message_code = detail.get("messageCode", message_code)
+        # Nếu có chi tiết lỗi nhỏ hơn bên trong
+        if "error" in detail and detail["error"]:
+            details = detail["error"].get("details", [])
+        else:
+            details = [ErrorDetails(field="server", message=[message])]
+    else:
+        message = str(detail)
+        details = [ErrorDetails(field="server", message=[message])]
+
     error_resp = ErrorResponseSchema(
-        message=str(exc.detail),
-        messageCode="HTTP_ERROR",
-        error=ErrorContent(details=[ErrorDetails(field="server", message=[str(exc.detail)])]),
+        message=message,
+        messageCode=message_code,
+        error=ErrorContent(details=details) if details else None,
         path=request.url.path
     )
     return JSONResponse(status_code=exc.status_code, content=error_resp.model_dump(mode='json'))
+
 
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception):

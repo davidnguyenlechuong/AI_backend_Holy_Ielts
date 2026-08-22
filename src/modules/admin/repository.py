@@ -101,7 +101,9 @@ class IeltsExamRepository:
         page_size: int = 10,
         published_only: bool = False,
     ) -> Tuple[List[IeltsExam], int]:
-        query = select(IeltsExam)
+        query = select(IeltsExam).options(
+            selectinload(IeltsExam.question_links).selectinload(IeltsExamQuestion.question)
+        )
         if published_only:
             query = query.where(IeltsExam.is_published.is_(True))
         query = query.order_by(IeltsExam.created_at.desc())
@@ -112,10 +114,6 @@ class IeltsExamRepository:
         paginated = query.offset((page - 1) * page_size).limit(page_size)
         result = await self.db.execute(paginated)
         exams = list(result.scalars().all())
-
-        # Load question links for each exam
-        for exam in exams:
-            await self.db.refresh(exam, ["question_links"])
         return exams, total
 
     async def get_by_id(self, exam_id: uuid.UUID) -> Optional[IeltsExam]:
@@ -181,8 +179,10 @@ class IeltsExamRepository:
             )
             self.db.add(link)
 
+        exam_id = exam.id
         await self.db.commit()
-        return await self.get_by_id(exam.id)  # type: ignore
+        self.db.expire(exam)
+        return await self.get_by_id(exam_id)  # type: ignore
 
     async def delete(self, exam: IeltsExam) -> None:
         await self.db.delete(exam)
